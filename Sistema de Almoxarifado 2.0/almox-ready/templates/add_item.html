@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Adicionar Item</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='add_item.css') }}">
+<script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+
+<body>
+<!-- dashboard-->
+<div class="container">
+<div class="navbar">
+    <a href="/home">
+        <button><b>?</b></button></a>
+    <a href="/add_item">
+        <button><b>MOVIMENTAÇÃO</b></button></a>
+    <a href="/estoque">
+        <button><b>ESTOQUE</b></button></a>
+    <a href="/"><button><b> FECHAR </b></button></a>
+</div>
+    </div>
+
+ <h1>Estoque<br>Autopeças</h1>
+
+<div class="linha_de_adicao">
+    <input type="text" id="codigo1" placehlder="Código">
+    <input type="text" id="descricao1" placeholder="Descrição">
+    <input type="number" id="qtd1" placeholder="Qtd">
+    <input type="number" id="preco1" placeholder="Preço">
+    <button onclick="adicionar()">Adicionar</button>
+</div>
+<!-- Tabela -->
+     <table id="tabela1">
+        <tr>
+            <th>Código</th>
+            <th>Descrição</th>
+            <th>Qtd</th>
+            <th>Preço</th>
+            <th>Status</th>
+        </tr>
+
+        <tr>
+            <td>XX001</td>
+            <td>Vela de ignição</td>
+            <td>100</td>
+            <td>R$300</td>
+            <td class="status-ok">Baixo</td>
+        </tr>
+
+        <tr>
+            <td>XX002</td>
+            <td>Virabrequim</td>
+            <td>180K</td>
+            <td>R$2K</td>
+            <td class="status-baixo">Disponível</td>
+        </tr>
+        <tr>
+            <td>XX003</td>
+            <td>Pistão</td>
+            <td>600K</td>
+            <td>R$1.3K</td>
+            <td class="status-ok">Disponível</td>
+        </tr>
+
+        <tr>
+            <td>XX004</td>
+            <td>Amortecedor</td>
+            <td>180K</td>
+            <td>R$750</td>
+            <td class="status-baixo">Baixo</td>
+        </tr>
+        <tr>
+            <td>XX005</td>
+            <td>Embreagem</td>
+            <td>10K</td>
+            <td>R$1.250</td>
+            <td class="status-ok">Baixo</td>
+        </tr>
+
+        <tr>
+            <td>XX006</td>
+            <td>Pastilha de freio</td>
+            <td>100K</td>
+            <td>R$550</td>
+            <td class="status-baixo">Disponível</td>
+        </tr>
+        </tr>
+    </table>
+</body>
+</html>

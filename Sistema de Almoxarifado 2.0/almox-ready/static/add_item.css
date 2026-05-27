@@ -1,0 +1,98 @@
+body {
+    background-color:#1f4a85;
+    font: large Arial, sans-serif;
+}
+
+input,
+button {
+    padding: 10px;
+    margin: 3px;
+    border-radius: 10px;
+}
+
+input {
+    border: 1px solid #ccc;
+}
+
+h1 {
+    color: #fff;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 60px;
+}
+
+button {
+    background: #0a1f44;
+    color: #fff;
+    border: 1px solid #fff;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #12306b;
+}
+
+table {
+    width: 80%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #fff;
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background: #0a1f44;
+    color: #fff;
+}
+
+td {
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+    background: #f2f6ff;
+}
+
+.linha_de_adicao{
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.navbar {
+    background-color: white;
+    width: 3000px;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar a {
+    display: contents;
+}
+
+.navbar button {
+    top: 47px;
+    width: 230px;
+    height: 50px;
+    border-radius: 40px;
+    background-color: white;
+    border-width: 0px;
+    font-size: 20px;
+    color: #135E9F;
+    cursor: pointer;
+}
