@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Estoque</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='estoque.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 
@@ -16,8 +17,11 @@
     <a href="/add_item">
         <button><b>MOVIMENTAÇÃO</b></button></a>
     <a href="/estoque">
-        <button><b>ESTOQUE</b></button></a>
-    <a href="/"><button><b> FECHAR </b></button></a>
+        <button><b><u>ESTOQUE</u></b></button></a>
+    <a href="/">
+        <button><b> FECHAR </b></button></a>
+    <a href="/adm">
+        <button><b>?</b></button></a>
 </div>
     </div>
     <h1>    
@@ -26,10 +30,11 @@
        <table id="tabela">
         <tr>
             <th>Código</th>
-            <th>Descrição</th>
+            <th>Nome</th>
             <th>Qtd</th>
             <th>Preço</th>
             <th>Status</th>
+            <th>Imagem</th>
         </tr>
 
         <tr>
@@ -38,6 +43,7 @@
             <td>100</td>
             <td>R$300</td>
             <td class="status-ok">Baixo</td>
+            <td><button onclick="mostrarAlerta()">Imagem</button></td>
         </tr>
 
         <tr>
@@ -46,6 +52,7 @@
             <td>180K</td>
             <td>R$2K</td>
             <td class="status-baixo">Disponível</td>
+            <td><button onclick="mostrarAlerta()">Imagem</button></td>
         </tr>
         <tr>
             <td>XX003</td>
@@ -53,6 +60,7 @@
             <td>600K</td>
             <td>R$1.3K</td>
             <td class="status-ok">Disponível</td>
+            <td><button onclick="mostrarAlerta()">Imagem</button></td>
         </tr>
 
         <tr>
@@ -61,6 +69,7 @@
             <td>180K</td>
             <td>R$750</td>
             <td class="status-baixo">Baixo</td>
+            <td><button onclick="mostrarAlerta()">Imagem</button></td>
         </tr>
         <tr>
             <td>XX005</td>
@@ -68,6 +77,7 @@
             <td>10K</td>
             <td>R$1.250</td>
             <td class="status-ok">Baixo</td>
+            <td><button onclick="mostrarAlerta()">Imagem</button></td>
         </tr>
 
         <tr>
@@ -76,7 +86,7 @@
             <td>100K</td>
             <td>R$550</td>
             <td class="status-baixo">Disponível</td>
-        </tr>
+            <td><button onclick="mostrarAlerta()">Imagem</button></td>
         </tr>
     </table>
 </body>
