@@ -18,6 +18,7 @@ def estoque():
     )
     cursor = conexao.cursor()
     cursor.execute("SELECT * FROM objetos_do_roger")
+    resultado = cursor.fetchall()
 
     return render_template('estoque.html', resultado=resultado)
     
