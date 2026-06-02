@@ -25,11 +25,18 @@ def estoque():
 
 @app.route("/add_item")
 def add_item():
-    return render_template("add_item.html")
+    conexao= mysql.connector.connect(  
+        host='localhost',
+        port='3306',
+        username='root',
+        database='roger_partidaco',
+        password='Bcm-0157'
+    )
+    cursor = conexao.cursor()
+    cursor.execute("SELECT * FROM objetos_do_roger")
+    resultado = cursor.fetchall()
 
-@app.route("/ret_item")
-def ret_item():
-    return render_template("ret_item.html")
+    return render_template('add_item.html', resultado=resultado)
 
 @app.route("/home")
 def home():
