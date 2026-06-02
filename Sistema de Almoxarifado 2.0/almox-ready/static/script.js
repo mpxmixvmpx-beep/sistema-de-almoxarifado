@@ -90,6 +90,8 @@ function remover() {
     }
 
     alert("Produto não encontrado");
+
+    
 }
 //Pagina do Roger
 function aumentar(imagem) {

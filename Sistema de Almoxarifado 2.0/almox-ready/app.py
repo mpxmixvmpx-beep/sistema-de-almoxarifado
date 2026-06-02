@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+import mysql.connector
 
 app = Flask(__name__)
 
@@ -8,7 +9,19 @@ def index():
 
 @app.route("/estoque")
 def estoque():
-    return render_template("estoque.html")
+    conexao= mysql.connector.connect(  
+        host='localhost',
+        port='3306',
+        username='root',
+        database='roger_partidaco',
+        password='Bcm-0157'
+    )
+    cursor = conexao.cursor()
+    cursor.execute("SELECT * FROM objetos_do_roger")
+    resultado = cursor.fetchall()
+
+    return render_template('estoque.html', resultado=resultado)
+    
 
 @app.route("/add_item")
 def add_item():
@@ -23,11 +36,8 @@ def home():
     return render_template("Home.html")
 
 @app.route("/adm")
-def home():
+def adm():
     return render_template("adm_page.html")
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)   
-
-
-   
+    app.run(host="127.0.0.1", port=5000, debug=True)

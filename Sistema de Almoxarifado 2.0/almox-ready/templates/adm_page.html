@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Estoque</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='adm_page-.+.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='adm_page.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
@@ -21,7 +21,7 @@
     <a href="/">
         <button><b> FECHAR </b></button></a>
     <a href="/adm">
-        <button><b>?</b></button></a>
+        <button><b>ADM</b></button></a>
 </div>
     </div>
     <h1>    
@@ -86,7 +86,7 @@
             <td>100K</td>
             <td>R$550</td>
             <td class="status-baixo">Disponível</td>
-            <td><button onclick="mostrarAlerta('Descrição')">Info</button></td>
+            <td><button onclick="mostrarAlerta('')">Info</button></td>
         </tr>
     </table>
 </body>
