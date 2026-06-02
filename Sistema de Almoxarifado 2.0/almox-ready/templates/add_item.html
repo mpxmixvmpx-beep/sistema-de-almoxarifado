@@ -22,76 +22,46 @@
     <a href="/adm">
         <button><b>ADM</b></button></a>
 </div>
+    <div class="senailogo-container">
+        <img src="{{ url_for('static', filename='senailogo.png') }}" alt="SENAI" class="senailogo">
+    </div>
     </div>
 
  <h1>ADICIONAR E RETIRAR</h1>
 
 <div class="linha_de_adicao">
-    <input type="text" id="codigo1" placehlder="Código">
+    <input type="text" id="codigo1" placeholder="Código">
     <input type="text" id="descricao1" placeholder="Descrição">
     <input type="number" id="qtd1" placeholder="Qtd">
     <input type="number" id="preco1" placeholder="Preço">
+    <input type="text" id="situacao1" placeholder="Situação">
 
 <!-- botoes para add e ret item-->
+ <form action="">
     <button onclick="adicionar()">Adicionar</button>
+ </form>
     <button onclick="rem()">Retirar</button>
 </div>
-<!-- Tabela -->
-     <table id="tabela1">
+<table id="tabela">
         <tr>
-            <th>Código</th>
-            <th>Descrição</th>
-            <th>Qtd</th>
-            <th>Preço</th>
-            <th>Status</th>
+            <th>Código:</th>
+            <th>Nome:</th>
+            <th>Qtd:</th>
+            <th>Preço:</th>
+            <th>Status:</th>
+            <th>Imagem:</th>
         </tr>
-
-        <tr>
-            <td>XX001</td>
-            <td>Vela de ignição</td>
-            <td>100</td>
-            <td>R$300</td>
-            <td class="status-ok">Baixo</td>
-        </tr>
-
-        <tr>
-            <td>XX002</td>
-            <td>Virabrequim</td>
-            <td>180K</td>
-            <td>R$2K</td>
-            <td class="status-baixo">Disponível</td>
-        </tr>
-        <tr>
-            <td>XX003</td>
-            <td>Pistão</td>
-            <td>600K</td>
-            <td>R$1.3K</td>
-            <td class="status-ok">Disponível</td>
-        </tr>
-
-        <tr>
-            <td>XX004</td>
-            <td>Amortecedor</td>
-            <td>180K</td>
-            <td>R$750</td>
-            <td class="status-baixo">Baixo</td>
-        </tr>
-        <tr>
-            <td>XX005</td>
-            <td>Embreagem</td>
-            <td>10K</td>
-            <td>R$1.250</td>
-            <td class="status-ok">Baixo</td>
-        </tr>
-
-        <tr>
-            <td>XX006</td>
-            <td>Pastilha de freio</td>
-            <td>100K</td>
-            <td>R$550</td>
-            <td class="status-baixo">Disponível</td>
-        </tr>
-        </tr>
+        {% for item in resultado %}
+            <tr>
+                <th>{{item[0]}}</th>
+                <th>{{item[1]}}</th>
+                <th>{{item[2]}}</th>
+                <th>{{item[3]}}</th>
+                <th>{{item[4]}}</th>
+                <th>{{item[5]}}</th>
+            </tr>
+        {% endfor %}
     </table>
+
 </body>
 </html>

@@ -22,18 +22,19 @@ h1 {
 }
 
 button {
-    background: #0a1f44;
+    background: #192A6B;
     color: #fff;
     border: 1px solid #fff;
     cursor: pointer;
 }
 
 button:hover {
-    background: #12306b;
+    background: #192A6B;
 }
 
 table {
-    width: 80%;
+    width: 95%;
+    height: 95%;
     margin-top: 20px;
     margin-left: auto;
     margin-right: auto;
@@ -70,6 +71,7 @@ tr:hover {
     display: flex;
     align-items: center;
     gap: 5px;
+    position: relative;
 }
 
 .navbar {
@@ -93,6 +95,14 @@ tr:hover {
     background-color: white;
     border-width: 0px;
     font-size: 20px;
-    color: #135E9F;
+    color: #192A6B;
     cursor: pointer;
+}
+
+.senailogo {
+    position: absolute;
+    left: 10px;
+    top: 85px;
+    width: 20%;
+    height: auto;
 }

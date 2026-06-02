@@ -14,7 +14,7 @@ def estoque():
         port='3306',
         username='root',
         database='roger_partidaco',
-        password='Bcm-0157'
+        password=''
     )
     cursor = conexao.cursor()
     cursor.execute("SELECT * FROM objetos_do_roger")
@@ -30,13 +30,13 @@ def add_item():
         port='3306',
         username='root',
         database='roger_partidaco',
-        password='Bcm-0157'
+        password=''
     )
     cursor = conexao.cursor()
     cursor.execute("SELECT * FROM objetos_do_roger")
     resultado = cursor.fetchall()
 
-    return render_template('add_item.html', resultado=resultado)
+    return render_template('add_item.html')
 
 @app.route("/home")
 def home():
@@ -44,7 +44,18 @@ def home():
 
 @app.route("/adm")
 def adm():
-    return render_template("adm_page.html")
+    conexao= mysql.connector.connect(  
+        host='localhost',
+        port='3306',
+        username='root',
+        database='roger_partidaco',
+        password=''
+    )
+    cursor = conexao.cursor()
+    cursor.execute("SELECT * FROM usuarios")
+    resultado = cursor.fetchall()
+
+    return render_template('adm_page.html', resultado=resultado)
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)

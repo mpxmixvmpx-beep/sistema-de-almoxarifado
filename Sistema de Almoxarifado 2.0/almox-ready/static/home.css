@@ -28,7 +28,7 @@ body {
     background-color: white;
     border-width: 0px;
     font-size: 20px;
-    color: #135E9F;
+    color: #192A6B;
     cursor: pointer;
 }
 
@@ -36,13 +36,30 @@ body {
     display: flex;
     align-items: center;
     gap: 5px;
+    position: relative;
 }
 
-.rogerimg img {
-    max-width: 400px;    /* Limita o tamanho máximo sem esticar */
-    width: auto;
-    height: auto;        /* Mantém a proporção natural */
-    display: block;
-    margin: 0 auto;      /* Centraliza a imagem */
+.rogerimg {
+    text-align: center;
+    margin-top: 20px;
+}
 
+.roger-img {
+    max-width: 400px;
+    width: auto;
+    height: auto;
+    display: inline-block;
+    transition: transform 0.6s ease;
+}
+
+.roger-img:hover {
+    transform: scale(1.15) rotate(360deg);
+}
+
+.senailogo {
+    position: absolute;
+    left: 10px;
+    top: 85px;
+    width: 20%;
+    height: auto;
 }

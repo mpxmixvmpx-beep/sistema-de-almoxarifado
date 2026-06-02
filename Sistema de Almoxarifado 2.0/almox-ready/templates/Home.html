@@ -12,24 +12,25 @@
 <div class="container">
 <div class="navbar">
     <a href="/home">
-        <button><b>?</b></button></a>
+        <button><b><U>?</U></b></button></a>
     <a href="/add_item">
         <button><b>MOVIMENTAÇÃO</b></button></a>
     <a href="/estoque">
-        <button><b><u>ESTOQUE</u></b></button></a>
+        <button><b>ESTOQUE</b></button></a>
     <a href="/">
         <button><b> FECHAR </b></button></a>
     <a href="/adm">
         <button><b>ADM</b></button></a>
 </div>
+    <div class="senailogo-container">
+        <img src="{{ url_for('static', filename='senailogo.png') }}" alt="SENAI" class="senailogo">
+    </div>
     </div>
     <br><br>
 
     <div class="rogerimg">
-    <img src="/static/roger sem fundo.png" 
-         onmouseover="aumentar(this)" 
-         onmouseout="diminuir(this)">
-</div>
+    <img src="/static/roger sem fundo.png" alt="Roger" class="roger-img">
+    </div>
     
 </body>
 </html>

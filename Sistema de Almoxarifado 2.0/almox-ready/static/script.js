@@ -93,33 +93,26 @@ function remover() {
 
     
 }
-//Pagina do Roger
-function aumentar(imagem) {
-    imagem.style.transform = "scale(1.2)"; // Aumenta
-}
-
-function diminuir(imagem) {
-    imagem.style.transform = "scale(1)"; // Volta ao normal
-}
+//Pagina do Roger (efeito simplificado via CSS :hover em home.css)
 
 //Pagina do Estoque
-function mostrarAlerta(codigo, descricao, qtd, preco, status) {
-    const imagensPorFerramenta = {
-        "Vela de ignição": "https://source.unsplash.com/400x200/?spark-plug",
-        "Virabrequim": "https://source.unsplash.com/400x200/?crankshaft",
-        "Pistão": "https://source.unsplash.com/400x200/?piston",
-        "Amortecedor": "https://source.unsplash.com/400x200/?shock-absorber",
-        "Embreagem": "https://source.unsplash.com/400x200/?clutch",
-        "Pastilha de freio": "https://source.unsplash.com/400x200/?brake-pad"
-    };
+//function mostrarAlerta(codigo, descricao, qtd, preco, status) {
+    //const imagensPorFerramenta = {
+        //"Vela de ignição": "https://source.unsplash.com/400x200/?spark-plug",
+        //"Virabrequim": "https://source.unsplash.com/400x200/?crankshaft",
+        //"Pistão": "https://source.unsplash.com/400x200/?piston",
+        //"Amortecedor": "https://source.unsplash.com/400x200/?shock-absorber",
+        //"Embreagem": "https://source.unsplash.com/400x200/?clutch",
+        //"Pastilha de freio": "https://source.unsplash.com/400x200/?brake-pad"
+    //};
 
-    const imageUrl = imagensPorFerramenta[descricao] || "https://source.unsplash.com/400x200/?tools";
+    //const imageUrl = imagensPorFerramenta[descricao] || "https://source.unsplash.com/400x200/?tools";
 
-    Swal.fire({
-        text: `Descrição: ${descricao}`,
-        imageUrl,
-        imageWidth: 400,
-        imageHeight: 200,
-        imageAlt: descricao
-    });
-}
+    //Swal.fire({
+        //text: `Descrição: ${descricao}`,
+        //imageUrl,
+        //imageWidth: 400,
+        //imageHeight: 200,
+        //imageAlt: descricao
+    //});
+//}

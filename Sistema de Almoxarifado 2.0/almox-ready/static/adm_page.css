@@ -32,7 +32,8 @@ button:hover {
 }
 
 table {
-    width: 80%;
+    width: 95%;
+    height: 95%;
     margin-top: 100px;
     margin-left: auto;
     margin-right: auto;
@@ -62,6 +63,7 @@ tr:hover {
     display: flex;
     align-items: center;
     gap: 5px;
+    position: relative;
 }
 
 .navbar {
@@ -89,4 +91,12 @@ tr:hover {
     color: #192A6B;
     cursor: pointer;
     font-style: bold;
+}
+
+.senailogo {
+    position: absolute;
+    left: 10px;
+    top: 85px;
+    width: 20%;
+    height: auto;
 }

@@ -17,77 +17,32 @@
     <a href="/add_item">
         <button><b>MOVIMENTAÇÃO</b></button></a>
     <a href="/estoque">
-        <button><b><u>ESTOQUE</u></b></button></a>
+        <button><b>ESTOQUE</b></button></a>
     <a href="/">
         <button><b> FECHAR </b></button></a>
     <a href="/adm">
-        <button><b>ADM</b></button></a>
+        <button><b><u>ADM</u></b></button></a>
 </div>
+    <div class="senailogo-container">
+        <img src="{{ url_for('static', filename='senailogo.png') }}" alt="SENAI" class="senailogo">
+    </div>
     </div>
     <h1>    
-        ALMOXARIFADO
+        USUÁRIOS
     </h1>
        <table id="tabela">
         <tr>
-            <th>Código</th>
-            <th>Descrição</th>
-            <th>Qtd</th>
-            <th>Preço</th>
-            <th>Status</th>
-            <th>Info</th>
+            <th>ID:</th>
+            <th>Usuário:</th>
+            <th>Senha:</th>
         </tr>
-
-        <tr>
-            <td>XX001</td>
-            <td>Vela de ignição</td>
-            <td>100</td>
-            <td>R$300</td>
-            <td class="status-ok">Baixo</td>
-            <td><button onclick="mostrarAlerta('Descrição')">Info</button></td>
-        </tr>
-
-        <tr>
-            <td>XX002</td>
-            <td>Virabrequim</td>
-            <td>180K</td>
-            <td>R$2K</td>
-            <td class="status-baixo">Disponível</td>
-            <td><button onclick="mostrarAlerta('Descrição')">Info</button></td>
-        </tr>
-        <tr>
-            <td>XX003</td>
-            <td>Pistão</td>
-            <td>600K</td>
-            <td>R$1.3K</td>
-            <td class="status-ok">Disponível</td>
-            <td><button onclick="mostrarAlerta('Descrição')">Info</button></td>
-        </tr>
-
-        <tr>
-            <td>XX004</td>
-            <td>Amortecedor</td>
-            <td>180K</td>
-            <td>R$750</td>
-            <td class="status-baixo">Baixo</td>
-            <td><button onclick="mostrarAlerta('Descrição')">Info</button></td>
-        </tr>
-        <tr>
-            <td>XX005</td>
-            <td>Embreagem</td>
-            <td>10K</td>
-            <td>R$1.250</td>
-            <td class="status-ok">Baixo</td>
-            <td><button onclick="mostrarAlerta('Descrição')">Info</button></td>
-        </tr>
-
-        <tr>
-            <td>XX006</td>
-            <td>Pastilha de freio</td>
-            <td>100K</td>
-            <td>R$550</td>
-            <td class="status-baixo">Disponível</td>
-            <td><button onclick="mostrarAlerta('')">Info</button></td>
-        </tr>
+        {% for item in resultado %}
+            <tr>
+                <th>{{item[0]}}</th>
+                <th>{{item[1]}}</th>
+                <th>{{item[2]}}</th>
+            </tr>
+        {% endfor %}
     </table>
 </body>
 </html>
