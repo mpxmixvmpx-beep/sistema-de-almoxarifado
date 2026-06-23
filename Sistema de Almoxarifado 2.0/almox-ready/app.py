@@ -25,16 +25,26 @@ def estoque():
 
 @app.route("/add_item")
 def add_item():
-    conexao= mysql.connector.connect(  
+    nome = request.form.get('nome')
+    nome = request.form.get('nome')
+    nome = request.form.get('nome')
+    nome = request.form.get('nome')
+
+    banco= mysql.connector.connect(  
         host='localhost',
         port='3306',
         username='root',
         database='roger_partidaco',
         password=''
     )
-    cursor = conexao.cursor()
+    cursor = banco.cursor()
+    query = "INSERT INTO objetos_do_roger"
     cursor.execute("SELECT * FROM objetos_do_roger")
-    resultado = cursor.fetchall()
+    resultado = cursor.fetchall()git commit -m "ajustes na rota add_item"
+
+
+    INSERT INTO objetos_do_roger (nome, qtd, preco, situacao, imagem)
+    VALUES ('chave_de_fenda', 78, 'R$67,00', 'disponivel', 'nada');
 
     return render_template('add_item.html')
 
