@@ -1,0 +1,19 @@
+    codigo = request.form.get('codigo1')
+    nome = request.form.get('nomr1')
+    qtd = request.form.get('qtd1')
+    preco = request.form.get('preco1')
+    situacao = request.form.get('situacao1')
+    imagem = request.form.get('imagem1')
+
+
+    banco= mysql.connector.connect(  
+        host='localhost',
+        port='3306',
+        username='root',
+        database='roger_partidaco',
+        password=''
+    )
+    cursor = banco.cursor()
+    query = "INSERT INTO objetos_do_roger (nome, qtd, preco, situacao, imagem) VALUES (%s, %i, %i, %s, %s );"
+    cursor.execute(nome, qtd, preco, situacao, imagem)
+    resultado = cursor.fetchall()

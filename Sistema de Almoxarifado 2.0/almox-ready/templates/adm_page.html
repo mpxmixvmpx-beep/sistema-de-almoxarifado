@@ -27,9 +27,18 @@
         <img src="{{ url_for('static', filename='senailogo.png') }}" alt="SENAI" class="senailogo">
     </div>
     </div>
-    <h1>    
+    <h1>  
+      
         USUÁRIOS
     </h1>
+
+      <br>
+      <div class ="botaoADM">
+            <button onclick="adicionar()">Adicionar</button>
+
+            <button onclick="rem()">Retirar</button>
+        </div>
+
        <table id="tabela">
         <tr>
             <th>ID:</th>
@@ -42,7 +51,15 @@
                 <th>{{item[1]}}</th>
                 <th>{{item[2]}}</th>
             </tr>
+
+            <tr>
+                <th>{{item[0]}}</th>
+                <th>{{item[1]}}</th>
+                <th>{{item[2]}}</th>
+            </tr>
+
         {% endfor %}
     </table>
+
 </body>
 </html>
