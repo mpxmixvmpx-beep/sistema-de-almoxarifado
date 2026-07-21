@@ -1,0 +1,40 @@
+CREATE DATABASE roger_partidaco;
+
+USE roger_partidaco;
+
+CREATE TABLE objetos_do_roger (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    qtd INT,
+    preco VARCHAR(100),
+    situacao VARCHAR(50),
+    imagem VARCHAR(500)
+);
+
+SELECT * FROM objetos_do_roger;
+
+INSERT INTO objetos_do_roger (nome, qtd, preco, situacao, imagem)
+VALUES ('chave_de_fenda', 78, 'R$67,00', 'disponivel', 'https://www.meionews.com/curiosidades/cachorro-encontra-penis-de-borracha-em-passeio-na-praia-416866');
+
+INSERT INTO objetos_do_roger (nome, qtd, preco, situacao, imagem)
+VALUES ('alicate', 250, 'R$40,00', 'disponivel', 'https://www.santil.com.br/alicate-universal-8-polegadas-isolacao-1000v-tramontina/p?srsltid=AfmBOorU8B59hECxOE5HKoK_AEse_uewLS0kjCl-xNRK3iWo8ZkXUdaN');
+
+INSERT INTO objetos_do_roger (nome, qtd, preco, situacao, imagem)
+VALUES ('parafusadeira', 50, 'R$259,00', 'disponivel', 'https://casadosoldador.com.br/p/furadeira-e-parafusadeira-de-impacto-12v-bivolt-hp333dwyx3-makita-7441?srsltid=AfmBOorg0Pyb_qoug8qsMAxYKgW6g4VgSicp9ZXjSLWv8MvXghoYlIRJ');
+
+INSERT INTO objetos_do_roger (nome, qtd, preco, situacao, imagem)
+VALUES ('martelo', 500, 'R$89,00', 'disponivel', 'https://www.google.com/imgres?q=martelo&imgurl=https%3A%2F%2Fdaxonart8aj4m.cloudfront.net%2FCustom%2FContent%2FProducts%2F11%2F69%2F11694_45095-martelo-unha-de-ao-polido-n-27-com-cabo-de-madeira-momfort_z1_638655620171153454.webp&imgrefurl=https%3A%2F%2Fwww.proposto.com.br%2F45095-martelo-unha-de-ao-polido-n-27-com-cabo-de-madeira-momfort-p11694%3Fsrsltid%3DAfmBOopNLwzhLhEoGSzMkxl1o-mRrPaUGKsiPAX5ekTQeGji83EQwHhP&docid=tYB9w6-_VgIw_M&tbnid=3kl9twFDt28U0M&vet=12ahUKEwjh_r32l52VAxWbnpUCHf9vCdUQnPAOegQIHBAB..i&w=1200&h=1200&hcb=2&ved=2ahUKEwjh_r32l52VAxWbnpUCHf9vCdUQnPAOegQIHBAB');
+
+CREATE TABLE usuarios (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    senha INT
+);
+
+SELECT * FROM usuarios;
+
+INSERT INTO usuarios (nome, senha)
+VALUES ('user', '1234');
+
+INSERT INTO usuarios (nome, senha)
+VALUES ('admin', '4321')
