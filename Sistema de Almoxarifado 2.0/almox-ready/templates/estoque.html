@@ -14,8 +14,8 @@
 <div class="navbar">
     <a href="/home">
         <button><b>?</b></button></a>
-    <a href="/add_item">
-        <button><b>MOVIMENTAÇÃO</b></button></a>
+    <a href="/cadastro">
+        <button><b>CADASTRO</b></button></a>
     <a href="/estoque">
         <button><b><u>ESTOQUE</u></b></button></a>
     <a href="/">
@@ -35,9 +35,10 @@
         <tr>
             <th>Código:</th>
             <th>Nome:</th>
-            <th>Qtd:</th>
+            <th>Descrição:</th>
+            <th>Quantidade:</th>
             <th>Preço:</th>
-            <th>Status:</th>
+            
             <th>Imagem:</th>
         </tr>
         {% for item in resultado %}
@@ -47,9 +48,21 @@
                 <th>{{item[2]}}</th>
                 <th>{{item[3]}}</th>
                 <th>{{item[4]}}</th>
-                <th>{{item[5]}}</th>
+                <th><button onclick="mostrar_foto('{{item[5]}}')">Ver Imagem</button></th>
             </tr>
         {% endfor %}
     </table>
+
+    <script>
+        function mostrar_foto(arg) {
+            Swal.fire({
+                title: 'Ver Imagem',
+                imageUrl: arg,
+                imageWidth: 400,
+                imageHeight: 200,
+                imageAlt: 'Foto do Item',
+            });
+        }
+    </script>
 </body>
 </html>

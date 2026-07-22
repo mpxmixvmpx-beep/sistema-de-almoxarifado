@@ -1,0 +1,122 @@
+body {
+    background-color:#192A6B;
+    font: large Arial, sans-serif;
+}
+
+h1.titulo_pagina {
+    color: #fff;
+    text-align: center;
+    margin-top: 35px;
+    margin-bottom: 20px;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: 1px;
+}
+
+.area_conclusao {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.texto_conclusao {
+    color: #fff;
+    font-size: 20px;
+    text-align: center;
+    margin: 0;
+}
+
+.botao_adicionar {
+    background-color: #fff;
+    color: #192A6B;
+    border: 2px solid #192A6B;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.botao_adicionar:hover {
+    background-color: #f0f0f0;
+    border-color: #192A6B;
+}
+
+table {
+    width: 95%;
+    height: 95%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #fff;
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background: #0a1f44;
+    color: #fff;
+}
+
+td {
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+    background: #f2f6ff;
+}
+
+.linha_de_adicao{
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    position: relative;
+}
+
+.navbar {
+    background-color: white;
+    width: 3000px;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar a {
+    display: contents;
+}
+
+.navbar button {
+    top: 47px;
+    width: 230px;
+    height: 50px;
+    border-radius: 40px;
+    background-color: white;
+    border-width: 0px;
+    font-size: 20px;
+    color: #192A6B;
+    cursor: pointer;
+}
+
+.senailogo {
+    position: absolute;
+    left: 10px;
+    top: 85px;
+    width: 20%;
+    height: auto;
+}
