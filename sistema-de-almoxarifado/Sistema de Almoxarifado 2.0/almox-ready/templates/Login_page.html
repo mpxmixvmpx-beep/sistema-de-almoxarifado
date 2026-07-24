@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+
+    
+</head>
+<body>
+        <img src="{{ url_for('static', filename='imagens/rogerio.png') }}" alt="Imagem de login" class="imagem">
+        <div class="barra-de-login">
+            <h1 class="titulo"><b>SISTEMA <br>DE<br>ALMOXARIFADO</b></h1>
+            <div class="usuario">
+                <label for="usuario"><b>Usuário:</b></label>
+                <input type="text" id="usuario" name="usuario">
+            </div>
+            <div class="senha">
+                <label for="senha"><b>Senha:</b></label>
+                <input type="password" id="senha" name="senha">
+            </div>
+            <button onclick="verificarLogin()" class="entrar"><b>ENTRAR COMO USUÁRIO</b></button>
+            <button onclick="verificarLogin20()" class="admin"><b>ENTRAR COMO ADMINISTRADOR</b></button>
+        </div>
+</body>
+</html>

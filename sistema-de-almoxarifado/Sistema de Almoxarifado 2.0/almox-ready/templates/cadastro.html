@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cadastro</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='cadastro.css') }}">
+</head>
+<body>
+
+<div class="container">
+<div class="navbar">
+    <a href="/home">
+        <button><b>?</b></button></a>
+    <a href="/movimentacao">
+        <button><b>MOVIMENTAÇÃO</b></button></a> 
+    <a href="/cadastro">
+        <button><b><u>CADASTRO</u></b></button></a>
+    <a href="/estoque">
+        <button><b>ESTOQUE</b></button></a>
+    <a href="/">
+        <button><b>FECHAR</b></button></a>
+    <a href="/adm">
+        <button><b>ADM</b></button></a>
+</div>
+    <div class="senailogo-container">
+        <img src="{{ url_for('static', filename='imagens/senailogo.png') }}" alt="SENAI" class="senailogo">
+    </div>
+    </div>
+
+<h1 class="titulo_pagina">CADASTRAR NOVOS ITENS</h1>
+<div id="form_cadastro" class="area_formulario">
+<form action="/cadastro_concluido" method="POST" class="formulario_cadastro">
+
+    <div class="linha_campo">
+        <label class="rotulo_campo" for="nome">Nome do Item:</label>
+        <input type="text" class="entrada_campo" id="nome" placeholder="Nome" name="nome">
+    </div>
+
+    <div class="linha_campo">
+        <label class="rotulo_campo" for="descricao">Descrição:</label>
+        <input type="text" class="entrada_campo" id="descricao" placeholder="Descrição" name="descricao">
+    </div>
+
+    <div class="linha_campo">
+        <label class="rotulo_campo" for="qtd">Quantidade:</label>
+        <input type="number" class="entrada_campo" id="qtd" placeholder="Quantidade" name="qtd">
+    </div>
+
+    <div class="linha_campo">
+        <label class="rotulo_campo" for="preco">Preço:</label>
+        <input type="number" class="entrada_campo" id="preco" placeholder="Preço" name="preco">
+    </div>
+
+    <div class="linha_campo">
+        <label class="rotulo_campo" for="imagem">Link para Imagem:</label>
+        <input type="text" class="entrada_campo" id="imagem" placeholder="Link para Imagem" name="imagem">
+    </div>
+
+    <button type="submit" class="botao_cadastrar">Cadastrar</button>
+</form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cadastro Concluido</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='cadastro_concluido.css') }}">
+<script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+
+<body>
+<!-- dashboard-->
+<div class="container">
+<div class="navbar">
+    <a href="/home">
+        <button><b>?</b></button></a>
+    <a href="/movimentacao">
+        <button><b>MOVIMENTAÇÃO</b></button></a> 
+    <a href="/cadastro">
+        <button><b><u>CADASTRO</u></b></button></a>
+    <a href="/estoque">
+        <button><b>ESTOQUE</b></button></a>
+    <a href="/">
+        <button><b> FECHAR </b></button></a>
+    <a href="/adm">
+        <button><b>ADM</b></button></a>
+</div>
+    <div class="senailogo-container">
+        <img src="{{ url_for('static', filename='imagens/senailogo.png') }}" alt="SENAI" class="senailogo">
+    </div>
+    </div>
+
+ <h1 class="titulo_pagina">CADASTRO CONCLUÍDO</h1>
+
+<div class="area_conclusao">
+    <p class="texto_conclusao">Cadastro realizado com sucesso!</p>
+    <img src="{{ url_for('static', filename='imagens/rogeraura.png') }}" class="imagem_conclusao">
+    <a href="/estoque" class="botao_adicionar">Ver estoque</a>
+</div>
+
+</body>
+</html>
