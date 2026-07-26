@@ -20,6 +20,30 @@ def index():
 def movimentacao():
     return render_template("movimentacao.html")
 
+@app.route("/movimentacao_concluida" , methods=['POST'])
+def movimentacao_concluida():
+    nome = request.form.get('nome')
+    qtd = request.form.get('qtd')
+    selecao = request.form.get('selecao')
+    conexao = obter_conexao()
+
+    cursor = conexao.cursor()
+    nome = (nome,)
+    query = "SELECT qtd FROM objetos_do_roger WHERE nome = %s;"
+
+    cursor.execute(query, nome,)
+
+    qtd_banco = cursor.fetchone() 
+    qtd_banco = qtd_banco[0]
+
+    if selecao == "1": #AUMENTAR A QUANTIDADE DE ITENS NO ESTOQUE
+        qtd = qtd_banco + qtd
+    
+    #if selecao == "2":
+        #DIMINUIR A QUANTIDADE DE ITENS NO ESTOQUE
+
+    return render_template("movimentacao_concluida.html", qtd_banco=qtd_banco)
+
 @app.route("/estoque")
 def estoque():
     conexao = obter_conexao()

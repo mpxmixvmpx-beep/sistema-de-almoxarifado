@@ -35,7 +35,7 @@ h1.titulo_pagina {
     padding: 10px 12px;
 }
 
-select.entrada_campo {
+.entrada_campo {
     height: 44px;
     padding: 10px 12px;
     appearance: none;

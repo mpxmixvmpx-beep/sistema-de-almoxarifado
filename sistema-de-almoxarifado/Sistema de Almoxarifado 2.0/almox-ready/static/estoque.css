@@ -70,6 +70,7 @@ tr:hover {
     align-items: center;
     gap: 5px;
     position: relative;
+    margin-top: 10px;
 }
 
 .navbar {
