@@ -14,9 +14,13 @@ CREATE TABLE objetos_do_roger (
 INSERT INTO objetos_do_roger (nome, descricao, qtd, preco, imagem)
 VALUES ('chave de fenda', 'serve para apertar', 78, 67.00, 'static/chavedefenda.png');
 
-DELETE FROM objetos_do_roger WHERE id = 1;
-
 SELECT * FROM objetos_do_roger;
+
+SELECT  qtd FROM estoque WHERE nome = 'teste';
+
+UPDATE objetos_do_roger
+SET qtd = 35
+WHERE nome = 'teste';
 
 -- 5. Recriação da tabela de usuários
 DROP TABLE IF EXISTS usuarios;
