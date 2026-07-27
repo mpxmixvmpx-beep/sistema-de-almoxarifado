@@ -2,26 +2,25 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Estoque</title>
+    <title>Inserir Usuários</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='adm_page.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 
 <body>
-<!-- dashboard-->
 <div class="container">
 <div class="navbar">
     <a href="/home">
         <button><b>?</b></button></a>
     <a href="/movimentacao">
-        <button><b>MOVIMENTAÇÃO</b></button></a> 
+        <button><b>MOVIMENTAÇÃO</b></button></a>
     <a href="/cadastro">
         <button><b>CADASTRO</b></button></a>
     <a href="/estoque">
         <button><b>ESTOQUE</b></button></a>
     <a href="/">
-        <button><b> FECHAR </b></button></a>
+        <button><b>FECHAR</b></button></a>
     <a href="/adm">
         <button><b><u>ADM</u></b></button></a>
 </div>
@@ -29,39 +28,33 @@
         <img src="{{ url_for('static', filename='imagens/senailogo.png') }}" alt="SENAI" class="senailogo">
     </div>
     </div>
-    <h1>  
-      
-        USUÁRIOS
-    </h1>
 
-      <br>
-      <div class ="botaoADM">
-            <button onclick="adicionar()">Adicionar</button>
+<h1 class="titulo_pagina">CRIAR USUÁRIOS</h1>
+<div id="form_cadastro" class="area_formulario">
+    
+<form action="/inserir_user_concluido" method="POST" class="formulario_cadastro">
 
-            <button onclick="rem()">Retirar</button>
-        </div>
+    <div class="linha_campo">
+        <label class="rotulo_campo">Tipo:</label>
+        <select class="entrada_campo" name="selecao">
+            <option selected>Selecione o tipo de permissão</option>
+            <option value="1">Administrador</option>
+            <option value="2">Usuário</option>
+        </select>
+    </div>
 
-       <table id="tabela">
-        <tr>
-            <th>ID:</th>
-            <th>Usuário:</th>
-            <th>Senha:</th>
-        </tr>
-        {% for item in resultado %}
-            <tr>
-                <th>{{item[0]}}</th>
-                <th>{{item[1]}}</th>
-                <th>{{item[2]}}</th>
-            </tr>
+    <div class="linha_campo">
+        <label class="rotulo_campo" for="nome">Nome do Usuário:</label>
+        <input type="text" class="entrada_campo" id="nome" placeholder="Nome" name="nome">
+    </div>
 
-            <tr>
-                <th>{{item[0]}}</th>
-                <th>{{item[1]}}</th>
-                <th>{{item[2]}}</th>
-            </tr>
+    <div class="linha_campo">
+        <label class="rotulo_campo" for="qtd">Senha:</label>
+        <input type="password" class="entrada_campo" id="qtd" placeholder="Senha" name="senha">
+    </div>
 
-        {% endfor %}
-    </table>
-
+    <button type="submit" class="botao_cadastrar">Inserir Usuário</button>
+</form>
+</div>
 </body>
 </html>

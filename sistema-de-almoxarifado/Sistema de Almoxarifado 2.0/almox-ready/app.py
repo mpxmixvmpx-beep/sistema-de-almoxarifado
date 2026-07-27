@@ -27,7 +27,7 @@ def movimentacao_concluida():
     selecao = request.form.get('selecao')
     conexao = obter_conexao()
 
-    cursor = conexao.cursor()
+    cursor = conexao.cursor(buffered=True)
     nome = (nome,)
     query = "SELECT qtd FROM objetos_do_roger WHERE nome = %s;"
 
