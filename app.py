@@ -20,67 +20,32 @@ def validar_login(user, password):
 
     query = "SELECT nome, senha FROM usuarios WHERE nome = %s"
     cursor.execute(query, (user,))
-    resultado = cursor.fetchone()  # Traz apenas o usuário encontrado ou None
+    resultado = cursor.fetchone()  # Pega 1 usuário ou None (evita IndexError)
 
-    cursor.close()
-    conexao.close()
-
-    # Se não encontrou o usuário
     if not resultado:
         return False
 
+    usuario_banco = resultado[0]
     senha_banco = resultado[1]
 
-    # Prepara as senhas para verificação em bytes
-    bytes_senha = password.encode('utf-8')
-    if isinstance(senha_banco, str):
-        senha_banco = senha_banco.encode('utf-8')
-
-    # Valida o hash com bcrypt
+    # Validação do bcrypt (e fallback para texto puro se necessário)
     try:
-        if bcrypt.checkpw(bytes_senha, senha_banco):
-            return True
+        bytes_senha = password.encode('utf-8')
+        if isinstance(senha_banco, str):
+            senha_banco = senha_banco.encode('utf-8')
+        return bcrypt.checkpw(bytes_senha, senha_banco)
     except Exception:
-        # Fallback caso a senha no banco esteja em texto puro
-        if resultado[1] == password:
-            return True
-
-    return False
+        return usuario_banco == user and senha_banco == password
 
 app = Flask(__name__)
-
-@app.route("/")
-def index():
-    return render_template("Login_page.html")
 
 @app.route("/login_incorreto")
 def login_incorreto():
     return render_template("login_incorreto.html")
 
-@app.route("/home")
-def home():
-    return render_template("Home.html")
-
-@app.route("/estoque", methods=['POST', 'GET'])
-def estoque():
-    user = request.form.get('user')
-    password = request.form.get('password')
-
-    # Valida login se for enviado formulário via POST
-    if request.method == 'POST':
-        login_validado = validar_login(user, password)
-        if not login_validado:
-            return render_template('login_incorreto.html')
-
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-    cursor.execute("SELECT * FROM objetos_do_roger")
-    resultado = cursor.fetchall()
-
-    cursor.close()
-    conexao.close()
-
-    return render_template('estoque.html', resultado=resultado)
+@app.route("/")
+def index():
+    return render_template("Login_page.html")
 
 @app.route("/movimentacao")
 def movimentacao():
@@ -91,38 +56,58 @@ def movimentacao_concluida():
     nome = request.form.get('nome')
     qtd = request.form.get('qtd')
     selecao = request.form.get('selecao')
-
     conexao = obter_conexao()
-    cursor = conexao.cursor(buffered=True)
 
-    # Removidas as aspas simples de '%s'
+    cursor = conexao.cursor(buffered=True)
+    nome_tupla = (nome,)
     query = "SELECT qtd FROM objetos_do_roger WHERE nome = %s"
-    cursor.execute(query, (nome,))
+
+    cursor.execute(query, nome_tupla)
 
     qtd_banco = cursor.fetchone() 
     if qtd_banco:
         qtd_banco = int(qtd_banco[0])
-        qtd = int(qtd)
 
-        if selecao == '1':   # AUMENTAR A QUANTIDADE
-            nova_qtd = qtd_banco + qtd
-        elif selecao == '2': # DIMINUIR A QUANTIDADE
-            nova_qtd = qtd_banco - qtd
-        else:
-            nova_qtd = qtd_banco
+        if selecao == '1': # AUMENTAR A QUANTIDADE DE ITENS NO ESTOQUE
+            qtd = int(qtd)
+            qtd = qtd_banco + qtd
 
-        query_update = "UPDATE objetos_do_roger SET qtd = %s WHERE nome = %s;"
-        cursor.execute(query_update, (nova_qtd, nome))
+        if selecao == '2': # DIMINUIR A QUANTIDADE DE ITENS NO ESTOQUE
+            qtd = int(qtd)
+            qtd = qtd_banco - qtd
+
+        query = "UPDATE objetos_do_roger SET qtd = %s WHERE nome = %s;"
+        valores = [qtd, nome]
+       
+        cursor.execute(query, valores)
         conexao.commit()
 
-    cursor.close()
-    conexao.close()
-
     return render_template("movimentacao_concluida.html")
+
+@app.route("/estoque", methods=['POST', 'GET'])
+def estoque():
+    user = request.form.get('user')
+    password = request.form.get('password')
+
+    login_validado = validar_login(user, password)
+
+    if not login_validado:
+        return render_template('login_incorreto.html')
+
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+    cursor.execute("SELECT * FROM objetos_do_roger")
+    resultado = cursor.fetchall()
+
+    return render_template('estoque.html', resultado=resultado)
 
 @app.route("/cadastro")
 def cadastro():
     return render_template('cadastro.html')
+
+@app.route("/home")
+def home():
+    return render_template("Home.html")
 
 @app.route("/cadastro_concluido", methods=['GET', 'POST'])
 def cadastro_concluido():
@@ -134,14 +119,9 @@ def cadastro_concluido():
 
     conexao = obter_conexao()
     cursor = conexao.cursor()
-    
     query = "INSERT INTO objetos_do_roger (nome, descricao, qtd, preco, imagem) VALUES (%s, %s, %s, %s, %s);"
     cursor.execute(query, (nome, descricao, qtd, preco, imagem))
     conexao.commit()
-
-    cursor.close()
-    conexao.close()
-
     return render_template("cadastro_concluido.html")
 
 @app.route("/adm")
@@ -151,29 +131,26 @@ def adm():
     cursor.execute("SELECT * FROM usuarios")
     resultado = cursor.fetchall()
 
-    cursor.close()
-    conexao.close()
-
     return render_template('adm_page.html', resultado=resultado)
 
 @app.route("/adicionar_user_concluido", methods=['POST'])
 def adicionar_user_concluido():
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+
     nome = request.form.get('nome')
     senha = request.form.get('senha')
     tipo = request.form.get('selecao')
 
     bytes_senha = senha.encode('utf-8')
+    # Adicionado .decode('utf-8') para converter os bytes do bcrypt em string
     hash_senha = bcrypt.hashpw(bytes_senha, bcrypt.gensalt()).decode('utf-8')
 
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-
     query = "INSERT INTO usuarios (nome, senha, tipo) VALUES (%s, %s, %s);"
-    cursor.execute(query, (nome, hash_senha, tipo))
-    conexao.commit()
+    valores = (nome, hash_senha, tipo)
 
-    cursor.close()
-    conexao.close()
+    cursor.execute(query, valores)
+    conexao.commit()
     
     return render_template('adicionar_user_concluido.html')
 
