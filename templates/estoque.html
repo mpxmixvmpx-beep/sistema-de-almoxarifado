@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estoque.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+
+<body>
+<!-- dashboard-->
+<div class="container">
+<div class="navbar">
+    <a href="/home">
+        <button><b>?</b></button></a>
+    <a href="/movimentacao">
+        <button><b>MOVIMENTAÇÃO</b></button></a> 
+    <a href="/cadastro">
+        <button><b>CADASTRO</b></button></a>
+    <a href="/estoque">
+        <button><b><u>ESTOQUE</u></b></button></a>
+    <a href="/">
+        <button><b> FECHAR </b></button></a>
+    <a href="/adm">
+        <button><b>ADM</b></button></a>
+</div>
+    <div class="senailogo-container">
+        <img src="{{ url_for('static', filename='imagens/senailogo.png') }}" alt="SENAI" class="senailogo">
+    </div>
+    </div>
+    {{linha}}
+    <h1 class="titulo_pagina">    
+        ALMOXARIFADO
+    </h1>
+       <table id="tabela">
+        <tr>
+            <th>Código:</th>
+            <th>Nome:</th>
+            <th>Descrição:</th>
+            <th>Quantidade:</th>
+            <th>Preço:</th>
+            <th>Imagem:</th>
+        </tr>
+        {% for item in resultado %}
+            <tr>
+                <th>{{item[0]}}</th>
+                <th>{{item[1]}}</th>
+                <th>{{item[2]}}</th>
+                <th>{{item[3]}}</th>
+                <th>{{item[4]}}</th>
+                <th><button class="botaodaimagem" onclick="mostrar_foto('{{item[5]}}')">Ver Imagem</button></th>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <script>
+        function mostrar_foto(arg) {
+            Swal.fire({
+                title: 'Imagem do Item',
+                imageUrl: arg,
+                imageWidth: 400,
+                imageHeight: 250,
+                imageAlt: 'Foto do Item',
+            });
+        }
+    </script>
+</body>
+</html>

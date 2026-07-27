@@ -1,0 +1,155 @@
+body {
+    background-color: #192A6B;
+    font: large Arial, sans-serif;
+    overflow: hidden;
+}
+
+h1.titulo_pagina {
+    color: #fff;
+    text-align: center;
+    margin-top: 35px;
+    margin-bottom: 20px;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: 1px;
+}
+
+.entrada_campo,
+.botao_cadastrar {
+    padding: 12px;
+    margin: 3px;
+    border-radius: 10px;
+}
+
+.entrada_campo {
+    border: none;
+    background-color: #fff;
+    color: #192A6B;
+    width: 100%;
+    box-sizing: border-box;
+    flex: 1;
+    font-size: 14px;
+    outline: none;
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+    height: 44px;
+    padding: 10px 12px;
+}
+
+.entrada_campo {
+    height: 44px;
+    padding: 10px 12px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.botao_cadastrar {
+    background-color: #F59E0B;
+    color: #192A6B;
+    border: 2px solid #192A6B;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    margin-top: 10px;
+}
+
+#form_cadastro {
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto 30px auto;
+    text-align: center;
+}
+
+.formulario_cadastro {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.linha_selecionar {
+    display: flex;
+    text-align: left;
+    gap: 12px;
+    padding: 24px 26px;
+    background-color: #fff;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: #192A6B;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: left;
+}
+
+.rotulo_selecionar {
+    color: #192A6B;
+    font-weight: bold;
+    text-align: left;
+    min-width: 150px;
+    padding-right: 14px;
+    font-size: 25px;
+    border-right: 1px solid rgba(25, 42, 107, 0.2);
+}
+
+.linha_campo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background-color: #fff;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.rotulo_campo {
+    color: #192A6B;
+    font-weight: bold;
+    text-align: left;
+    white-space: nowrap;
+    min-width: 150px;
+    padding-right: 14px;
+    border-right: 1px solid rgba(25, 42, 107, 0.2);
+}
+
+
+.container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    position: relative;
+}
+
+.navbar {
+    background-color: white;
+    width: 3000px;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar a {
+    display: contents;
+}
+
+.navbar button {
+    top: 47px;
+    width: 230px;
+    height: 50px;
+    border-radius: 40px;
+    background-color: white;
+    border-width: 0px;
+    font-size: 20px;
+    color: #192A6B;
+    cursor: pointer;
+}
+
+.senailogo {
+    position: absolute;
+    left: 10px;
+    top: 85px;
+    width: 20%;
+    height: auto;
+}
