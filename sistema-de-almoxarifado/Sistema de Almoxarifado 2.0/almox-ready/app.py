@@ -35,14 +35,25 @@ def movimentacao_concluida():
 
     qtd_banco = cursor.fetchone() 
     qtd_banco = qtd_banco[0]
+    qtd_banco = int(qtd_banco)
 
-    if selecao == "1": #AUMENTAR A QUANTIDADE DE ITENS NO ESTOQUE
+    if selecao == '1': #AUMENTAR A QUANTIDADE DE ITENS NO ESTOQUE
+        qtd = int(qtd)
         qtd = qtd_banco + qtd
-    
-    #if selecao == "2":
-        #DIMINUIR A QUANTIDADE DE ITENS NO ESTOQUE
 
-    return render_template("movimentacao_concluida.html", qtd_banco=qtd_banco)
+    
+    if selecao == '2': #DIMINUIR A QUANTIDADE DE ITENS NO ESTOQUE
+        qtd = int(qtd)
+        qtd = qtd_banco - qtd
+
+    nome = nome[0]    
+    query = "UPDATE objetos_do_roger SET qtd = %s WHERE nome = %s;"
+    valores = [qtd, nome,]
+   
+    cursor.execute(query, valores)
+    conexao.commit()
+
+    return render_template("movimentacao_concluida.html",)
 
 @app.route("/estoque")
 def estoque():
