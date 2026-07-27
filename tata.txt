@@ -16,29 +16,22 @@ VALUES ('chave de fenda', 'serve para apertar', 78, 67.00, 'static/chavedefenda.
 
 SELECT * FROM objetos_do_roger;
 
-SELECT  qtd FROM estoque WHERE nome = 'teste';
+SELECT  qtd FROM objetos_do_roger WHERE nome = 'teste';
 
 UPDATE objetos_do_roger
 SET qtd = 35
 WHERE nome = 'teste';
 
--- 5. Recriação da tabela de usuários
+SELECT * FROM usuarios;
+
 DROP TABLE IF EXISTS usuarios;
 CREATE TABLE usuarios (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
-    senha VARCHAR(255) NOT NULL 
+    senha VARCHAR(255) NOT NULL,
+    tipo VARCHAR(255) 
+    
 );
 
--- 6. Operações na tabela de usuários
-INSERT INTO usuarios (nome, senha)
-VALUES ('user', '1234');
-
-INSERT INTO usuarios (nome, senha)
-VALUES ('admin', '4321');
-
--- Retorna os dois usuários inseridos
-SELECT * FROM usuarios;
-
--- Reativa o modo de segurança (boa prática)
-SET SQL_SAFE_UPDATES = 1;
+INSERT INTO usuarios (nome, senha, tipo)
+VALUES ('antonio', '1234', 'user');
