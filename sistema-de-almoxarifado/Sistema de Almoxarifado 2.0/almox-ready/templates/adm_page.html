@@ -32,14 +32,14 @@
 <h1 class="titulo_pagina">CRIAR USUÁRIOS</h1>
 <div id="form_cadastro" class="area_formulario">
     
-<form action="/inserir_user_concluido" method="POST" class="formulario_cadastro">
+<form action="/adicionar_user_concluido" method="POST" class="formulario_cadastro">
 
     <div class="linha_campo">
         <label class="rotulo_campo">Tipo:</label>
         <select class="entrada_campo" name="selecao">
             <option selected>Selecione o tipo de permissão</option>
-            <option value="1">Administrador</option>
-            <option value="2">Usuário</option>
+            <option value="admin">Administrador</option>
+            <option value="user">Usuário</option>
         </select>
     </div>
 
@@ -53,7 +53,7 @@
         <input type="password" class="entrada_campo" id="qtd" placeholder="Senha" name="senha">
     </div>
 
-    <button type="submit" class="botao_cadastrar">Inserir Usuário</button>
+    <button type="submit" class="botao_cadastrar">Adicionar</button>
 </form>
 </div>
 </body>

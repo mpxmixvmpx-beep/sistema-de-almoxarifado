@@ -31,17 +31,18 @@ body {
     right: 1%;
 }
 
-.erro {
-    margin-bottom: 15px;
-    color: #192A6B;
-    font-size: 20px;
-}
-
 .usuario,
 .senha {
     margin-bottom: 15px;
     color: #F59E0B;
     font-size: 40px;
+}
+
+.erro {
+    margin-bottom: 15px;
+    color: #F59E0B;
+    font-size: 20px;
+    font-weight: bold;
 }
 
 label {

@@ -13,7 +13,7 @@
     <a href="/home">
         <button><b>?</b></button></a>
     <a href="/movimentacao">
-        <button><b><u>MOVIMENTAÇÃO</u></b></button></a>
+        <button><b>MOVIMENTAÇÃO</b></button></a>
     <a href="/cadastro">
         <button><b>CADASTRO</b></button></a>
     <a href="/estoque">
@@ -21,21 +21,21 @@
     <a href="/">
         <button><b>FECHAR</b></button></a>
     <a href="/adm">
-        <button><b>ADM</b></button></a>
+        <button><b><u>ADM</u></b></button></a>
 </div>
     <div class="senailogo-container">
         <img src="{{ url_for('static', filename='imagens/senailogo.png') }}" alt="SENAI" class="senailogo">
     </div>
     </div>
 
- <h1 class="titulo_pagina">MOVIMENTAÇÃO CONCLUÍDA</h1>
+ <h1 class="titulo_pagina">ADICIONAMENTO CONCLUÍDO</h1>
 
  {{qtd_banco}}
 
 <div class="area_conclusao">
-    <p class="texto_conclusao">Item movido com sucesso!</p>
-    <img src="{{ url_for('static', filename='imagens/rogerlaser.png') }}" class="imagem_conclusao">
-    <a href="/estoque" class="botao_adicionar">Ver estoque</a>
+    <p class="texto_conclusao">Usuário adicionado com sucesso!</p>
+    <img src="{{ url_for('static', filename='imagens/rogermtaaura.png') }}" class="imagem_conclusao">
+    <a href="/estoque" class="botao_adicionar">Ver Usuários</a>
 </div>
 
 </body>

@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+import bcrypt
 import mysql.connector
 
 def obter_conexao():
@@ -10,7 +11,15 @@ def obter_conexao():
         password='Bcm-0157'
     )
 
+def validar_login():
+    if validacao == falsa:
+        return redener_template("Login_incorreto.html")
+
 app = Flask(__name__)
+
+@app.route("/login_incorreto")
+def login_incorreto():
+    return render_template("Login_incorreto.html")
 
 @app.route("/")
 def index():
@@ -96,6 +105,26 @@ def adm():
     resultado = cursor.fetchall()
 
     return render_template('adm_page.html', resultado=resultado)
+
+@app.route("/adicionar_user_concluido", methods=['POST'])
+def adicionar_user_concluido():
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+
+    nome = request.form.get('nome')
+    senha = request.form.get('senha')
+    tipo = request.form.get('selecao')
+
+    bytes_senha = senha.encode('utf-8')
+    hash_senha = bcrypt.hashpw(bytes_senha, bcrypt.gensalt())
+
+    query = "INSERT INTO usuarios (nome, senha, tipo) VALUES (%s, %s, %s);"
+    valores = (nome, hash_senha, tipo)
+
+    cursor.execute(query, valores)
+    conexao.commit()
+    
+    return render_template('adicionar_user_concluido.html')
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
