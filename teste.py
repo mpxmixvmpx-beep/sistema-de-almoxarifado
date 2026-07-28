@@ -11,21 +11,34 @@ def obter_conexao():
         password=''
     )
 
-def validar_login(nome, senha):
-    if not nome or not senha:
+def validar_login(user, password):
+    if not user or not password:
         return False
 
     conexao = obter_conexao()
     cursor = conexao.cursor()
 
-    query = "SELECT nome, senha FROM usuarios WHERE nome = %s"
-    nome = (nome,)
+    query = "SELECT senha FROM usuarios WHERE nome = %s"
+    cursor.execute(query, (user,))
+    resultado = cursor.fetchone()
 
-    cursor.execute(query)
-    resultado = cursor.fetchall()
+    cursor.close()
+    conexao.close()
 
-    return render_template("login_incorreto.html")
+    if resultado:
+        senha_hash_banco = resultado[0]
+        # Converte a senha digitada para bytes
+        password_bytes = password.encode('utf-8')
+        
+        # Garante que a hash do banco esteja no formato bytes
+        if isinstance(senha_hash_banco, str):
+            senha_hash_banco = senha_hash_banco.encode('utf-8')
 
+        # Valida a senha digitada contra o hash do bcrypt
+        if bcrypt.checkpw(password_bytes, senha_hash_banco):
+            return True
+
+    return False
 
 app = Flask(__name__)
 
@@ -75,12 +88,13 @@ def movimentacao_concluida():
 
 @app.route("/estoque", methods=['POST', 'GET'])
 def estoque():
-        nome = request.form.get('nome')
-        senha = request.form.get('senha')
+    if request.method == 'POST':
+        user = request.form.get('user')
+        password = request.form.get('password')
 
-        validar_login(nome, senha)
+        login_validado = validar_login(user, password)
 
-        if not validar_login:
+        if not login_validado:
             return render_template('login_incorreto.html')
 
         conexao = obter_conexao()
@@ -139,17 +153,16 @@ def adm():
 
 @app.route("/adicionar_user_concluido", methods=['POST'])
 def adicionar_user_concluido():
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-
     nome = request.form.get('nome')
     senha = request.form.get('senha')
     tipo = request.form.get('selecao')
 
     bytes_senha = senha.encode('utf-8')
-    hash_senha = bcrypt.hashpw(bytes_senha, bcrypt.gensalt())
+    hash_senha = bcrypt.hashpw(bytes_senha, bcrypt.gensalt()).decode('utf-8')
 
-    query = "INSERT INTO usuarios (nome, senha, tipo) VALUES (%s, %s, %s)"
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+    query = "INSERT INTO usuarios (nome, senha, tipo) VALUES (%s, %s, %s);"
     valores = (nome, hash_senha, tipo)
 
     cursor.execute(query, valores)
