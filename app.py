@@ -21,11 +21,21 @@ def validar_login(nome, senha):
     query = "SELECT nome, senha FROM usuarios WHERE nome = %s"
     nome = (nome,)
 
-    cursor.execute(query)
+    cursor.execute(query, nome)
     resultado = cursor.fetchall()
 
-    return render_template("login_incorreto.html")
+    if resultado is None:
+        login_valido = False
+        return login_valido
 
+    validacao = bcrypt.checkpw(senha.enconde('utf-8'), resultado[0][1].encode('utf-8'))
+    nome = nome[0]
+
+    if resultado[0][0] == nome and validacao:
+        login_valido = True
+    else:
+        login_valido = False
+    return login_valido
 
 app = Flask(__name__)
 
@@ -75,26 +85,29 @@ def movimentacao_concluida():
 
 @app.route("/estoque", methods=['POST', 'GET'])
 def estoque():
+    if request.method == 'POST':
         nome = request.form.get('nome')
         senha = request.form.get('senha')
 
-        validar_login(nome, senha)
+        login_validado = validar_login(nome, senha)
 
-        if not validar_login:
+        if not login_validado:
             return render_template('login_incorreto.html')
 
         conexao = obter_conexao()
+
         cursor = conexao.cursor()
-        cursor.execute("SELECT * FROM objetos_do_roger")
+        query = ("SELECT * FROM objetos_do_roger")
+        cursor.execute(query)
+
         resultado = cursor.fetchall()
-        
+        conexao.commit()
+     
         cursor.close()
         conexao.close()
 
         return render_template('estoque.html', resultado=resultado)
     
-    return render_template('login_incorreto.html')
-
 @app.route("/cadastro")
 def cadastro():
     return render_template('cadastro.html')
