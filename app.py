@@ -19,17 +19,25 @@ def validar_login(nome, senha):
     cursor = conexao.cursor()
 
     query = "SELECT nome, senha FROM usuarios WHERE nome = %s"
-    nome = (nome,)
+    nome_tuple = (nome,)
 
-    cursor.execute(query, nome)
+    cursor.execute(query, nome_tuple)
     resultado = cursor.fetchall()
 
-    if resultado is None:
-        login_valido = False
-        return login_valido
+    cursor.close()
+    conexao.close()
 
-    validacao = bcrypt.checkpw(senha.enconde('utf-8'), resultado[0][1].encode('utf-8'))
-    nome = nome[0]
+    # fetchall() retorna lista vazia [] se não encontrar o usuário
+    if not resultado:
+        return False
+
+    # Garante que a senha do banco esteja em formato bytes para o bcrypt
+    senha_banco = resultado[0][1]
+    if isinstance(senha_banco, str):
+        senha_banco = senha_banco.encode('utf-8')
+
+    # Corrigido de 'enconde' para 'encode'
+    validacao = bcrypt.checkpw(senha.encode('utf-8'), senha_banco)
 
     if resultado[0][0] == nome and validacao:
         login_valido = True
@@ -85,29 +93,33 @@ def movimentacao_concluida():
 
 @app.route("/estoque", methods=['POST', 'GET'])
 def estoque():
+    # Pega os dados tanto via POST (formulário) quanto via GET (URL)
     if request.method == 'POST':
         nome = request.form.get('nome')
         senha = request.form.get('senha')
+    else:
+        nome = request.args.get('nome')
+        senha = request.args.get('senha')
 
-        login_validado = validar_login(nome, senha)
+    # Valida o login (se não preencheu 'nome' ou 'senha', a função retorna False)
+    login_validado = validar_login(nome, senha)
 
-        if not login_validado:
-            return render_template('login_incorreto.html')
+    # Se a senha/usuario estiver errada OU se não colocou nada:
+    if not login_validado:
+        return render_template('login_incorreto.html')
 
-        conexao = obter_conexao()
+    # Se o login deu certo, busca o estoque:
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+    query = ("SELECT * FROM objetos_do_roger")
+    cursor.execute(query)
 
-        cursor = conexao.cursor()
-        query = ("SELECT * FROM objetos_do_roger")
-        cursor.execute(query)
+    resultado = cursor.fetchall()
+    cursor.close()
+    conexao.close()
 
-        resultado = cursor.fetchall()
-        conexao.commit()
-     
-        cursor.close()
-        conexao.close()
+    return render_template('estoque.html', resultado=resultado)
 
-        return render_template('estoque.html', resultado=resultado)
-    
 @app.route("/cadastro")
 def cadastro():
     return render_template('cadastro.html')
