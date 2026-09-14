@@ -56,5 +56,27 @@
     <button type="submit" class="botao_cadastrar">Adicionar</button>
 </form>
 </div>
+
+<!-- MODIFICADO: tabela com os usuarios cadastrados. A senha nao e exibida. -->
+<h2 class="titulo_usuarios">USUÁRIOS CADASTRADOS</h2>
+<table class="tabela_usuarios">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Tipo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for usuario in resultado %}
+        <tr>
+            <!-- MODIFICADO: usa th nas linhas para ficar igual a tabela de estoque. -->
+            <th>{{ usuario[0] }}</th>
+            <th>{{ usuario[1] }}</th>
+            <th>{{ usuario[3] }}</th>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 </body>
 </html>

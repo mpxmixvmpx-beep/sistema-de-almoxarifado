@@ -53,7 +53,7 @@ table {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 8px;
+    gap: 0;
     flex-wrap: wrap;
 }
 
@@ -70,8 +70,6 @@ table {
 
 .botao-arquivo {
     display: inline-block;
-    width: auto;
-    height: auto;
     padding: 10px;
     margin: 3px;
     background: #ffffff;
@@ -79,8 +77,14 @@ table {
     border: 1px solid #ffffff;
     border-radius: 10px;
     cursor: pointer;
-    font-size: medium;
+    font-family: Arial, sans-serif;
+    font-size: 13.3333px;
+    font-weight: 400;
+    line-height: normal;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
 }
 
 th,

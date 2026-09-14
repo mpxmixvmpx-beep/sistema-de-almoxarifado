@@ -39,12 +39,15 @@ h1.titulo_pagina {
 }
 
 .botao_adicionar {
+    width: 190px;
+    height: 42px;
+    box-sizing: border-box;
     background-color: #F59E0B;
     color: #192A6B;
     border: 2px solid #192A6B;
     font-weight: bold;
     font-size: 16px;
-    padding: 12px 18px;
+    padding: 10px;
     border-radius: 10px;
     cursor: pointer;
     text-decoration: none;
