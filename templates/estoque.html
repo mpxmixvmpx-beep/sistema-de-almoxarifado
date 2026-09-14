@@ -22,8 +22,10 @@
         <button><b><u>ESTOQUE</u></b></button></a>
     <a href="/">
         <button><b> FECHAR </b></button></a>
+    {% if session.get('tipo') == 'admin' %}
     <a href="/adm">
         <button><b>ADM</b></button></a>
+    {% endif %}
 </div>
     <div class="senailogo-container">
         <img src="{{ url_for('static', filename='imagens/senailogo.png') }}" alt="SENAI" class="senailogo">
@@ -54,10 +56,33 @@
         {% endfor %}
     </table>
 
+    <!-- MODIFICADO: controles de exportacao, importacao e exclusao total. -->
+    <div class="acoes-estoque">
+        <a href="{{ url_for('exportar_csv') }}" download>
+            <button type="button">Exportar CSV</button>
+        </a>
+        <form action="{{ url_for('importar_csv') }}" method="POST" enctype="multipart/form-data">
+            <!-- MODIFICADO: botao de arquivo com o mesmo visual dos outros botoes. -->
+            <label class="botao-arquivo" for="arquivo_csv">Escolher arquivo</label>
+            <input class="arquivo-csv" id="arquivo_csv" type="file" name="arquivo_csv" accept=".csv" required>
+            <button type="submit">Importar CSV</button>
+        </form>
+        {% if session.get('tipo') == 'admin' %}
+        <form action="{{ url_for('excluir_todos_itens') }}" method="POST" onsubmit="return confirm('Excluir todos os itens do estoque?');">
+            <button type="submit">Excluir todos os itens</button>
+        </form>
+        {% endif %}
+    </div>
+
     <script>
+        // MODIFICADO: mostra o nome do arquivo escolhido no botao.
+        document.getElementById('arquivo_csv').addEventListener('change', function () {
+            const botao = document.querySelector('.botao-arquivo');
+            botao.textContent = this.files[0] ? this.files[0].name : 'Escolher arquivo';
+        });
+
         function mostrar_foto(arg) {
             Swal.fire({
-                title: 'Imagem do Item',
                 imageUrl: arg,
                 imageWidth: 400,
                 imageHeight: 250,

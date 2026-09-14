@@ -46,6 +46,43 @@ table {
     background: #fff;
 }
 
+/* MODIFICADO: posiciona os botoes do estoque abaixo da tabela, no canto direito. */
+.acoes-estoque {
+    width: 95%;
+    margin: 12px auto 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.acoes-estoque form {
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+/* MODIFICADO: deixa o seletor de arquivo branco com texto azul. */
+.arquivo-csv {
+    display: none;
+}
+
+.botao-arquivo {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    padding: 10px;
+    margin: 3px;
+    background: #ffffff;
+    color: #192A6B;
+    border: 1px solid #ffffff;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: medium;
+    white-space: nowrap;
+}
+
 th,
 td {
     padding: 8px;

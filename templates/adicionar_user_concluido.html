@@ -20,23 +20,25 @@
         <button><b>ESTOQUE</b></button></a>
     <a href="/">
         <button><b>FECHAR</b></button></a>
+    <!-- MODIFICADO: link ADM visivel somente para administradores. -->
+    {% if session.get('tipo') == 'admin' %}
     <a href="/adm">
         <button><b><u>ADM</u></b></button></a>
+    {% endif %}
 </div>
     <div class="senailogo-container">
         <img src="{{ url_for('static', filename='imagens/senailogo.png') }}" alt="SENAI" class="senailogo">
     </div>
     </div>
 
- <h1 class="titulo_pagina">ADICIONAMENTO CONCLUÍDO</h1>
+    <h1 class="titulo_pagina">ADICIONAMENTO CONCLUÍDO</h1>
 
- {{qtd_banco}}
-
-<div class="area_conclusao">
-    <p class="texto_conclusao">Usuário adicionado com sucesso!</p>
-    <img src="{{ url_for('static', filename='imagens/rogermtaaura.png') }}" class="imagem_conclusao">
-    <a href="/adm" class="botao_adicionar">Ver Usuários</a>
-</div>
+    <!-- MODIFICADO: conteúdo centralizado e organizado. -->
+    <div class="area_conclusao">
+        <p class="texto_conclusao">Usuário adicionado com sucesso!</p>
+        <img src="{{ url_for('static', filename='imagens/rogermtaaura.png') }}" class="imagem_conclusao" alt="Confirmação">
+        <a href="/adm" class="botao_adicionar">Ver Usuários</a>
+    </div>
 
 </body>
 </html>
