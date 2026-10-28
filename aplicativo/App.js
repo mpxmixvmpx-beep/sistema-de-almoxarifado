@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
   Image,
@@ -18,6 +18,7 @@ const NAVY = '#192A6B';
 const TABLE_NAVY = '#0A1F44';
 const GOLD = '#F59E0B';
 
+// Endereço da API: usa configuração explícita ou o servidor da rede local.
 const apiBaseUrl = () =>
   process.env.EXPO_PUBLIC_API_URL ||
   (typeof window !== 'undefined'
@@ -25,6 +26,7 @@ const apiBaseUrl = () =>
     : 'http://127.0.0.1:5000');
 
 export default function App() {
+  // Estado da sessão, dos dados exibidos e dos formulários.
   const [screen, setScreen] = useState('login');
   const [currentUser, setCurrentUser] = useState(null);
   const [items, setItems] = useState([]);
@@ -34,6 +36,7 @@ export default function App() {
   const [notice, setNotice] = useState('');
   const [previewImage, setPreviewImage] = useState(null);
   const [previewImageError, setPreviewImageError] = useState(false);
+  const [homeImageRotated, setHomeImageRotated] = useState(false);
   const [cadastro, setCadastro] = useState({
     nome: '',
     descricao: '',
@@ -50,6 +53,7 @@ export default function App() {
   const [csvInput, setCsvInput] = useState('');
   const [csvOutput, setCsvOutput] = useState('');
 
+  // Centraliza as chamadas HTTP e transforma respostas de erro em mensagens legíveis.
   const request = async (path, options = {}) => {
     const baseUrl = apiBaseUrl();
     let response;
@@ -96,6 +100,7 @@ export default function App() {
     setUsers(await request('/api/usuarios'));
   };
 
+  // Autenticação e encerramento da sessão.
   const handleLogin = async () => {
     setLoginError('');
     try {
@@ -103,7 +108,7 @@ export default function App() {
       setCurrentUser(usuario);
       setItems(await request('/api/itens'));
       if (usuario.tipo === 'admin') await loadUsers();
-      setScreen('home');
+      setScreen('estoque');
     } catch (error) {
       setCurrentUser(null);
       setLoginError(error.message);
@@ -209,9 +214,45 @@ export default function App() {
     }
   };
 
+  // Seleciona um arquivo CSV no navegador e carrega o conteúdo no campo de importação.
+  const handleSelecionarCsv = () => {
+    if (typeof document === 'undefined') {
+      Alert.alert(
+        'Selecionar arquivo',
+        'A seleção direta de arquivo está disponível no navegador. Você também pode colar o conteúdo CSV no campo.',
+      );
+      return;
+    }
+
+    const seletorArquivo = document.createElement('input');
+    seletorArquivo.type = 'file';
+    seletorArquivo.accept = '.csv,text/csv';
+    seletorArquivo.onchange = async () => {
+      const arquivo = seletorArquivo.files?.[0];
+      if (!arquivo) return;
+
+      try {
+        const conteudo = await arquivo.text();
+        if (!conteudo.trim()) {
+          Alert.alert('CSV vazio', 'O arquivo selecionado não contém dados.');
+          return;
+        }
+
+        setCsvInput(conteudo);
+        setNotice(`Arquivo "${arquivo.name}" carregado. Clique em Importar CSV para continuar.`);
+      } catch (error) {
+        Alert.alert(
+          'Falha ao ler o arquivo',
+          error.message || 'Não foi possível ler o conteúdo do arquivo CSV.',
+        );
+      }
+    };
+    seletorArquivo.click();
+  };
+
   const handleImportar = async () => {
     if (!csvInput.trim()) {
-      Alert.alert('CSV vazio', 'Cole o conteúdo do arquivo CSV no campo.');
+      Alert.alert('CSV vazio', 'Selecione um arquivo CSV ou cole o conteúdo no campo.');
       return;
     }
     try {
@@ -246,18 +287,17 @@ export default function App() {
     ]);
   };
 
-  const navItems = useMemo(() => {
-    const links = [
-      { key: 'home', label: '?' },
-      { key: 'movimentacao', label: 'MOVIMENTAÇÃO' },
-      { key: 'cadastro', label: 'CADASTRO' },
-      { key: 'estoque', label: 'ESTOQUE' },
-      { key: 'logout', label: 'FECHAR' },
-    ];
-    if (currentUser?.tipo === 'admin') links.push({ key: 'adm', label: 'ADM' });
-    return links;
-  }, [currentUser]);
+  // Opções de navegação; a área administrativa só aparece para administradores.
+  const navItems = [
+    { key: 'home', label: '?' },
+    { key: 'movimentacao', label: 'MOVIMENTAÇÃO' },
+    { key: 'cadastro', label: 'CADASTRO' },
+    { key: 'estoque', label: 'ESTOQUE' },
+    { key: 'logout', label: 'FECHAR' },
+  ];
+  if (currentUser?.tipo === 'admin') navItems.push({ key: 'adm', label: 'ADM' });
 
+  // Converte caminhos de imagens locais em endereços acessíveis pela API.
   const imageUri = (image) => {
     if (!image || !image.trim()) return null;
     const savedImage = image.trim().replace(/\\/g, '/');
@@ -297,6 +337,7 @@ export default function App() {
   const updateAdmin = (key, value) =>
     setNovoUsuario((state) => ({ ...state, [key]: value }));
 
+  // Campo de formulário compartilhado para manter entradas e rótulos consistentes.
   const renderField = (label, value, onChangeText, options = {}) => {
     const { loginField, multiline, ...inputOptions } = options;
     return (
@@ -317,6 +358,7 @@ export default function App() {
     );
   };
 
+  // Elementos visuais reaproveitados entre as telas.
   const renderBrandHeader = () => (
     <View style={styles.siteHeader}>
       <ScrollView
@@ -359,10 +401,25 @@ export default function App() {
 
   const renderHome = () => (
     <View style={styles.homeContent}>
-      <Image source={require('./assets/roger-sem-fundo.png')} style={styles.homeImage} resizeMode="contain" />
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={() => setHomeImageRotated((rotated) => !rotated)}
+        accessibilityRole="button"
+        accessibilityLabel="Girar imagem da página inicial"
+      >
+        <Image
+          source={require('./assets/roger-sem-fundo.png')}
+          style={[
+            styles.homeImage,
+            { transform: [{ rotate: homeImageRotated ? '180deg' : '0deg' }] },
+          ]}
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
     </View>
   );
 
+  // Telas: estoque, cadastro, movimentação e administração.
   const renderStock = () => (
     <>
       <Text style={styles.pageTitle}>ALMOXARIFADO</Text>
@@ -421,8 +478,9 @@ export default function App() {
           />
         ) : null}
         <View style={styles.csvImport}>
+          <Button label="Selecionar arquivo CSV" secondary onPress={handleSelecionarCsv} />
           {renderField('Conteúdo CSV:', csvInput, setCsvInput, {
-            placeholder: 'id;nome;descricao;qtd;preco;imagem',
+            placeholder: 'id;nome;descricao;qtd;preco;imagem (separados por ponto e vírgula)',
             multiline: true,
           })}
           <Button label="Importar CSV" onPress={handleImportar} />
@@ -561,6 +619,7 @@ export default function App() {
     </>
   );
 
+  // Tela de autenticação exibida antes de iniciar uma sessão.
   if (!currentUser) {
     return (
       <SafeAreaView style={styles.loginApp}>
@@ -594,6 +653,7 @@ export default function App() {
     );
   }
 
+  // Estrutura principal: cabeçalho, avisos, tela atual e visualizador de imagens.
   return (
     <SafeAreaView style={styles.app}>
       <StatusBar barStyle="light-content" backgroundColor={NAVY} />
@@ -645,6 +705,7 @@ export default function App() {
   );
 }
 
+// Botão padrão do aplicativo, com variações para ações secundárias e login.
 function Button({ label, onPress, secondary = false, login = false }) {
   return (
     <TouchableOpacity
@@ -661,34 +722,25 @@ function Button({ label, onPress, secondary = false, login = false }) {
   );
 }
 
+// Estilos agrupados por tela e componente para facilitar ajustes visuais.
 const styles = StyleSheet.create({
+  // Login.
   app: { flex: 1, backgroundColor: NAVY, fontFamily: 'Arial' },
   loginApp: { flex: 1, backgroundColor: NAVY },
   loginScroll: { flexGrow: 1, backgroundColor: NAVY },
   loginHero: { height: 330, justifyContent: 'flex-end', backgroundColor: NAVY },
   loginHeroImage: { resizeMode: 'cover' },
-  loginTitleWrap: {
-    alignSelf: 'flex-end',
-    width: '54%',
-    paddingHorizontal: 12,
-    paddingBottom: 24,
-    backgroundColor: 'rgba(25,42,107,0.28)',
-  },
+  loginTitleWrap: { alignSelf: 'flex-end', width: '54%', paddingHorizontal: 12, paddingBottom: 24, backgroundColor: 'rgba(25,42,107,0.28)' },
   loginTitle: { color: '#FFFFFF', fontSize: 23, lineHeight: 27, fontWeight: 'bold' },
   loginPanel: { width: '56%', alignSelf: 'flex-end', paddingHorizontal: 16, paddingTop: 11 },
   loginField: { backgroundColor: 'transparent', padding: 0, borderWidth: 0, marginBottom: 12 },
   loginFieldLabel: { color: GOLD, borderRightWidth: 0, padding: 0, marginBottom: 5 },
   loginInput: { minHeight: 42, borderRadius: 18, backgroundColor: '#FFFFFF', paddingHorizontal: 12 },
   errorText: { color: '#FFFFFF', fontSize: 13, marginBottom: 8 },
+
+  // Navegação e área de conteúdo.
   siteHeader: { height: 75, backgroundColor: NAVY, position: 'relative', zIndex: 1 },
-  navbar: {
-    minWidth: '100%',
-    height: 75,
-    paddingHorizontal: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-  },
+  navbar: { minWidth: '100%', height: 75, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' },
   navButton: { minHeight: 45, paddingVertical: 12, paddingHorizontal: 8, marginHorizontal: 1, justifyContent: 'center' },
   navButtonActive: { borderRadius: 24, backgroundColor: '#F3F4F8' },
   navButtonText: { color: NAVY, fontSize: 10, fontWeight: 'bold', textAlign: 'center' },
@@ -698,158 +750,50 @@ const styles = StyleSheet.create({
   noticeText: { color: '#FFFFFF', fontSize: 13, textAlign: 'center' },
   content: { flex: 1, backgroundColor: NAVY },
   contentInner: { paddingHorizontal: 10, paddingTop: 35, paddingBottom: 22 },
-  pageTitle: {
-    color: '#FFFFFF',
-    textAlign: 'center',
-    fontFamily: 'Arial',
-    fontSize: 27,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-    marginTop: 6,
-    marginBottom: 20,
-  },
+  pageTitle: { color: '#FFFFFF', textAlign: 'center', fontFamily: 'Arial', fontSize: 27, fontWeight: 'bold', letterSpacing: 1, marginTop: 6, marginBottom: 20 },
   homeContent: { flex: 1, minHeight: 500, alignItems: 'center', marginTop: 15 },
   homeImage: { width: 400, maxWidth: '100%', height: 420 },
+
+  // Formulários e botões.
   formContainer: { width: '100%', maxWidth: 650, alignSelf: 'center', marginBottom: 30 },
-  formField: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.08)',
-  },
-  fieldLabel: {
-    flexShrink: 0,
-    minWidth: 95,
-    maxWidth: '40%',
-    color: NAVY,
-    fontSize: 13,
-    fontWeight: 'bold',
-    paddingRight: 9,
-    borderRightWidth: 1,
-    borderRightColor: 'rgba(25,42,107,0.2)',
-  },
-  input: {
-    flex: 1,
-    minWidth: 0,
-    minHeight: 42,
-    paddingHorizontal: 10,
-    paddingVertical: 9,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 0,
-    color: NAVY,
-    fontFamily: 'Arial',
-    fontSize: 14,
-  },
+  formField: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, marginBottom: 10, backgroundColor: '#FFFFFF', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' },
+  fieldLabel: { flexShrink: 0, minWidth: 95, maxWidth: '40%', color: NAVY, fontSize: 13, fontWeight: 'bold', paddingRight: 9, borderRightWidth: 1, borderRightColor: 'rgba(25,42,107,0.2)' },
+  input: { flex: 1, minWidth: 0, minHeight: 42, paddingHorizontal: 10, paddingVertical: 9, backgroundColor: '#FFFFFF', borderWidth: 0, color: NAVY, fontFamily: 'Arial', fontSize: 14 },
   multilineInput: { height: 90, textAlignVertical: 'top' },
-  primaryButton: {
-    alignSelf: 'center',
-    backgroundColor: GOLD,
-    borderWidth: 2,
-    borderColor: NAVY,
-    borderRadius: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 11,
-    marginTop: 8,
-  },
+  primaryButton: { alignSelf: 'center', backgroundColor: GOLD, borderWidth: 2, borderColor: NAVY, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 11, marginTop: 8 },
   primaryButtonText: { color: NAVY, fontSize: 16, fontWeight: 'bold', textAlign: 'center' },
   secondaryButton: { backgroundColor: '#FFFFFF', borderColor: '#FFFFFF' },
   secondaryButtonText: { color: NAVY, fontSize: 13, fontWeight: 'normal' },
   loginButton: { backgroundColor: '#CA7B16', borderColor: '#CA7B16', alignSelf: 'flex-start' },
-  stockTitleBlock: { marginBottom: 20 },
+
+  // Tabelas e ações de estoque.
   tableScroll: { maxHeight: 480, width: '100%' },
   tableScrollContent: { paddingBottom: 4 },
   tableContainer: { minWidth: 690, backgroundColor: '#FFFFFF' },
   tableHeaderRow: { flexDirection: 'row', backgroundColor: TABLE_NAVY },
-  tableHeaderCell: {
-    minHeight: 40,
-    paddingHorizontal: 5,
-    paddingVertical: 9,
-    color: '#FFFFFF',
-    backgroundColor: TABLE_NAVY,
-    textAlign: 'center',
-    fontFamily: 'Arial',
-    fontSize: 13,
-    fontWeight: 'bold',
-  },
-  tableRow: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#DDDDDD',
-  },
-  tableCell: {
-    minHeight: 42,
-    paddingHorizontal: 5,
-    paddingVertical: 9,
-    color: NAVY,
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    fontFamily: 'Arial',
-    fontSize: 13,
-    borderBottomWidth: 1,
-    borderBottomColor: '#DDDDDD',
-  },
+  tableHeaderCell: { minHeight: 40, paddingHorizontal: 5, paddingVertical: 9, color: '#FFFFFF', backgroundColor: TABLE_NAVY, textAlign: 'center', fontFamily: 'Arial', fontSize: 13, fontWeight: 'bold' },
+  tableRow: { flexDirection: 'row', backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#DDDDDD' },
+  tableCell: { minHeight: 42, paddingHorizontal: 5, paddingVertical: 9, color: NAVY, textAlign: 'center', textAlignVertical: 'center', fontFamily: 'Arial', fontSize: 13, borderBottomWidth: 1, borderBottomColor: '#DDDDDD' },
   imageCell: { justifyContent: 'center', alignItems: 'center' },
-  tableButton: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 7,
-  },
+  tableButton: { backgroundColor: '#FFFFFF', borderRadius: 10, paddingVertical: 8, paddingHorizontal: 7 },
   tableButtonText: { color: NAVY, fontSize: 12, textAlign: 'center' },
   stockActions: { width: '95%', alignSelf: 'center', marginTop: 8, marginBottom: 22 },
   stockButtonRow: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 5 },
-  standardButton: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 9,
-    marginHorizontal: 3,
-    marginVertical: 3,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  standardButton: { backgroundColor: '#FFFFFF', borderColor: '#FFFFFF', borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 9, marginHorizontal: 3, marginVertical: 3, alignItems: 'center', justifyContent: 'center' },
   standardButtonText: { color: NAVY, fontSize: 13, textAlign: 'center' },
   csvImport: { marginTop: 6 },
-  csvOutput: {
-    minHeight: 95,
-    maxHeight: 180,
-    marginVertical: 8,
-    backgroundColor: '#FFFFFF',
-    padding: 9,
-    color: NAVY,
-    fontSize: 11,
-  },
+
+  // Seleção de opções, usuários e visualizador de imagens.
+  csvOutput: { minHeight: 95, maxHeight: 180, marginVertical: 8, backgroundColor: '#FFFFFF', padding: 9, color: NAVY, fontSize: 11 },
   optionRow: { flex: 1, flexDirection: 'row', flexWrap: 'wrap' },
   optionSelected: { backgroundColor: GOLD, borderColor: NAVY },
   itemSelection: { flex: 1, flexDirection: 'row', flexWrap: 'wrap' },
   itemOption: { borderWidth: 1, borderColor: '#D5D5D5', borderRadius: 8, padding: 8, margin: 3 },
   itemOptionSelected: { backgroundColor: GOLD, borderColor: NAVY },
   itemOptionText: { color: NAVY, fontSize: 12 },
-  userTableTitle: {
-    color: '#FFFFFF',
-    textAlign: 'center',
-    fontFamily: 'Arial',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: 24,
-    marginBottom: 12,
-  },
+  userTableTitle: { color: '#FFFFFF', textAlign: 'center', fontFamily: 'Arial', fontSize: 22, fontWeight: 'bold', marginTop: 24, marginBottom: 12 },
   userTable: { alignSelf: 'center', backgroundColor: '#FFFFFF', marginBottom: 24 },
-  imageModalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
+  imageModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center', padding: 20 },
   imageModal: { width: '100%', maxWidth: 480, backgroundColor: '#FFFFFF', padding: 14, borderRadius: 8 },
   previewImage: { width: '100%', height: 250 },
   previewImageError: { color: '#B42318', fontSize: 14, textAlign: 'center', marginTop: 8 },
