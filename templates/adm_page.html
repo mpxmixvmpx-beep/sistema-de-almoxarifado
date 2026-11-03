@@ -2,8 +2,10 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inserir Usuários</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='adm_page.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
@@ -22,7 +24,7 @@
     <a href="/">
         <button><b>FECHAR</b></button></a>
     <a href="/adm">
-        <button><b><u>ADM</u></b></button></a>
+        <button class="active"><b>ADM</b></button></a>
 </div>
     <div class="senailogo-container">
         <img src="{{ url_for('static', filename='imagens/senailogo.png') }}" alt="SENAI" class="senailogo">

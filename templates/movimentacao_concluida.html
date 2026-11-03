@@ -2,8 +2,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Movimentação Concluída</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='movimentacao_concluida.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}">
 <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 
@@ -13,7 +15,7 @@
     <a href="/home">
         <button><b>?</b></button></a>
     <a href="/movimentacao">
-        <button><b><u>MOVIMENTAÇÃO</u></b></button></a>
+        <button class="active"><b>MOVIMENTAÇÃO</b></button></a>
     <a href="/cadastro">
         <button><b>CADASTRO</b></button></a>
     <a href="/estoque">

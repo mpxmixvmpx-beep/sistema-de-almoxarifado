@@ -1,0 +1,216 @@
+.navbar button {
+    text-decoration: none;
+}
+
+.navbar button.active {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+}
+
+@media (max-width: 700px) {
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        width: 100%;
+        min-height: 100%;
+        height: auto;
+        overflow-x: hidden;
+    }
+
+    body {
+        display: block;
+        margin: 0;
+        overflow-y: auto;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+    }
+
+    .container {
+        display: block;
+        width: 100%;
+        padding-bottom: 72px;
+    }
+
+    .navbar {
+        width: 100%;
+        height: 70px;
+        justify-content: flex-start;
+        gap: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0 6px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .navbar a {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+    }
+
+    .navbar button {
+        position: static;
+        width: auto;
+        min-width: 76px;
+        height: 50px;
+        padding: 8px 10px;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        font-size: clamp(11px, 3vw, 15px);
+        white-space: nowrap;
+    }
+
+    .senailogo {
+        position: absolute;
+        top: 78px;
+        left: 12px;
+        width: min(34vw, 130px);
+        height: auto;
+    }
+
+    h1.titulo_pagina {
+        margin: 8px 12px 20px;
+        font-size: clamp(26px, 7vw, 38px);
+    }
+
+    #tabela,
+    .tabela_usuarios {
+        display: block;
+        width: calc(100% - 24px);
+        height: auto;
+        margin: 12px;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #tabela th,
+    #tabela td,
+    .tabela_usuarios th,
+    .tabela_usuarios td {
+        padding: 10px 12px;
+    }
+
+    .acoes-estoque {
+        display: flex;
+        width: calc(100% - 24px);
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin: 12px auto 24px;
+    }
+
+    .acoes-estoque form {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #form_cadastro,
+    .area_formulario {
+        width: calc(100% - 24px);
+        max-width: 650px;
+        margin: 0 auto 24px;
+    }
+
+    .formulario_cadastro {
+        width: 100%;
+    }
+
+    .linha_campo {
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .rotulo_campo {
+        min-width: 0;
+        max-width: 42%;
+        padding-right: 8px;
+        white-space: normal;
+        font-size: 14px;
+    }
+
+    .entrada_campo {
+        min-width: 0;
+    }
+
+    .roger-img {
+        max-width: 90vw;
+        height: auto;
+    }
+
+    .area_conclusao {
+        padding: 0 12px 24px;
+    }
+
+    .imagem_conclusao {
+        max-width: 90vw;
+        height: auto;
+    }
+
+    #form_login {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 8px 24px 24px;
+    }
+
+    .imagem {
+        position: static;
+        display: block;
+        width: 100%;
+        height: clamp(220px, 36vh, 320px);
+        object-fit: cover;
+        object-position: center;
+        right: auto;
+    }
+
+    .barra-de-login {
+        width: 100%;
+        max-width: 430px;
+        margin: 0 auto;
+        right: auto;
+    }
+
+    .titulo {
+        margin: 0 0 22px;
+        font-size: clamp(32px, 8vw, 46px);
+        line-height: 1.1;
+        text-align: center;
+    }
+
+    .usuario,
+    .senha {
+        margin-bottom: 16px;
+        font-size: 20px;
+    }
+
+    label {
+        margin-bottom: 8px;
+    }
+
+    input {
+        position: static;
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 15px;
+    }
+
+    .erro {
+        display: block;
+        margin: 4px 0 12px;
+        font-size: 15px;
+    }
+
+    .entrar {
+        margin-top: 8px;
+        padding: 13px 24px;
+    }
+}

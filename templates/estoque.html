@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Estoque</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='estoque.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
@@ -19,7 +21,7 @@
     <a href="/cadastro">
         <button><b>CADASTRO</b></button></a>
     <a href="/estoque">
-        <button><b><u>ESTOQUE</u></b></button></a>
+        <button class="active"><b>ESTOQUE</b></button></a>
     <a href="/">
         <button><b> FECHAR </b></button></a>
     {% if session.get('tipo') == 'admin' %}

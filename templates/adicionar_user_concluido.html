@@ -2,8 +2,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Movimentação Concluída</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='movimentacao_concluida.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}">
 <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 
@@ -23,7 +25,7 @@
     <!-- MODIFICADO: link ADM visivel somente para administradores. -->
     {% if session.get('tipo') == 'admin' %}
     <a href="/adm">
-        <button><b><u>ADM</u></b></button></a>
+        <button class="active"><b>ADM</b></button></a>
     {% endif %}
 </div>
     <div class="senailogo-container">

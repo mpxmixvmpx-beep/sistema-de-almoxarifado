@@ -2,8 +2,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cadastro Concluido</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='cadastro_concluido.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}">
 <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 
@@ -16,7 +18,7 @@
     <a href="/movimentacao">
         <button><b>MOVIMENTAÇÃO</b></button></a> 
     <a href="/cadastro">
-        <button><b><u>CADASTRO</u></b></button></a>
+        <button class="active"><b>CADASTRO</b></button></a>
     <a href="/estoque">
         <button><b>ESTOQUE</b></button></a>
     <a href="/">
