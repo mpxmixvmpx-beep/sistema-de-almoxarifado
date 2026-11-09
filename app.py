@@ -7,12 +7,12 @@ import ipaddress
 from urllib.parse import urlparse
 
 def obter_conexao():
-    return mysql.connector.connect(  
-        host='localhost',
+    return mysql.connector.connect(
+        host='mysql',
         port='3306',
         user='root',
         database='roger_partidaco',
-        password=''
+        password='root'
     )
 
 def validar_login(nome, senha):
