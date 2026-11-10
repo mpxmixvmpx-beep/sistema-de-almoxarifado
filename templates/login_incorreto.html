@@ -7,11 +7,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='login_incorreto.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}">
-    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 
     
 </head>
-<body>
+<body class="login-page">
         <img src="{{ url_for('static', filename='imagens/rogerio.png') }}" alt="Imagem de login" class="imagem">
         <form id="form_login" action="/estoque" method="post">
         <div class="barra-de-login">

@@ -35,12 +35,12 @@
 <h1 class="titulo_pagina">ADICIONAR E RETIRAR ITENS</h1>
 <div id="form_cadastro" class="area_formulario">
     
-<form action="/movimentacao_concluida" method="POST" class="formulario_cadastro">
+<form action="/movimentacao_concluida" method="POST" class="formulario_cadastro" novalidate>
 
     <div class="linha_campo">
         <label class="rotulo_campo">Tipo:</label>
-        <select class="entrada_campo" name="selecao">
-            <option selected>Selecione o tipo de movimentação</option>
+        <select class="entrada_campo" name="selecao" required>
+            <option value="" selected disabled>Selecione o tipo de movimentação</option>
             <option value="1">Entrada</option>
             <option value="2">Saída</option>
         </select>
@@ -48,12 +48,12 @@
 
     <div class="linha_campo">
         <label class="rotulo_campo" for="nome">Nome do Item:</label>
-        <input type="text" class="entrada_campo" id="nome" placeholder="Nome" name="nome">
+        <input type="text" class="entrada_campo" id="nome" placeholder="Nome" name="nome" required>
     </div>
 
     <div class="linha_campo">
         <label class="rotulo_campo" for="qtd">Quantidade:</label>
-        <input type="number" class="entrada_campo" id="qtd" placeholder="Quantidade" name="qtd">
+        <input type="number" class="entrada_campo" id="qtd" placeholder="Quantidade" name="qtd" min="1" required>
     </div>
 
     <button type="submit" class="botao_cadastrar">Movimentar</button>

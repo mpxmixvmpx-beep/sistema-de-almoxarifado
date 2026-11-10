@@ -44,6 +44,8 @@ table {
     margin-left: auto;
     margin-right: auto;
     background: #fff;
+    border: 1px solid #fff;
+    border-collapse: collapse;
 }
 
 /* MODIFICADO: posiciona os botoes do estoque abaixo da tabela, no canto direito. */
@@ -94,12 +96,16 @@ td {
 }
 
 th {
-    background: #0a1f44;
-    color: #fff;
+    border: 1px solid #fff;
 }
 
 td {
-    border-bottom: 1px solid #ddd;
+    border: 1px solid #ddd;
+}
+
+th {
+    background: #0a1f44;
+    color: #fff;
 }
 
 tr:hover {

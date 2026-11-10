@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuário não cadastrado</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='movimentacao_concluida.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}">
+</head>
+<body>
+<div class="container">
+    <div class="navbar">
+        <a href="/home"><button><b>?</b></button></a>
+        <a href="/movimentacao"><button><b>MOVIMENTAÇÃO</b></button></a>
+        <a href="/cadastro"><button><b>CADASTRO</b></button></a>
+        <a href="/estoque"><button><b>ESTOQUE</b></button></a>
+        <a href="/"><button><b>FECHAR</b></button></a>
+        <a href="/adm"><button class="active"><b>ADM</b></button></a>
+    </div>
+    <div class="senailogo-container">
+        <img src="{{ url_for('static', filename='imagens/senailogo.png') }}" alt="SENAI" class="senailogo">
+    </div>
+</div>
+<h1 class="titulo_pagina">ERRO</h1>
+<div class="area_conclusao">
+    <p class="texto_conclusao">{{ mensagem_erro }}</p>
+    <img src="{{ url_for('static', filename='imagens/rogerbracocruzado.png') }}" class="imagem_conclusao" alt="Usuário não cadastrado">
+    <a href="/adm" class="botao_adicionar">Voltar</a>
+</div>
+</body>
+</html>

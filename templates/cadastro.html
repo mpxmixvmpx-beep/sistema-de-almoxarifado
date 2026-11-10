@@ -34,31 +34,31 @@
 
 <h1 class="titulo_pagina">CADASTRAR NOVOS ITENS</h1>
 <div id="form_cadastro" class="area_formulario">
-<form action="/cadastro_concluido" method="POST" class="formulario_cadastro">
+<form action="/cadastro_concluido" method="POST" class="formulario_cadastro" novalidate>
 
     <div class="linha_campo">
         <label class="rotulo_campo" for="nome">Nome do Item:</label>
-        <input type="text" class="entrada_campo" id="nome" placeholder="Nome" name="nome">
+        <input type="text" class="entrada_campo" id="nome" placeholder="Nome" name="nome" maxlength="100" required>
     </div>
 
     <div class="linha_campo">
         <label class="rotulo_campo" for="descricao">Descrição:</label>
-        <input type="text" class="entrada_campo" id="descricao" placeholder="Descrição" name="descricao">
+        <input type="text" class="entrada_campo" id="descricao" placeholder="Descrição" name="descricao" maxlength="50" required>
     </div>
 
     <div class="linha_campo">
         <label class="rotulo_campo" for="qtd">Quantidade:</label>
-        <input type="number" class="entrada_campo" id="qtd" placeholder="Quantidade" name="qtd">
+        <input type="number" class="entrada_campo" id="qtd" placeholder="Quantidade" name="qtd" min="0" required>
     </div>
 
     <div class="linha_campo">
         <label class="rotulo_campo" for="preco">Preço:</label>
-        <input type="number" class="entrada_campo" id="preco" placeholder="Preço" name="preco">
+        <input type="number" class="entrada_campo" id="preco" placeholder="Preço" name="preco" min="0" step="0.01" required>
     </div>
 
     <div class="linha_campo">
         <label class="rotulo_campo" for="imagem">Link para Imagem:</label>
-        <input type="text" class="entrada_campo" id="imagem" placeholder="Link para Imagem" name="imagem">
+        <input type="text" class="entrada_campo" id="imagem" placeholder="Link para Imagem" name="imagem" maxlength="500" required>
     </div>
 
     <button type="submit" class="botao_cadastrar">Cadastrar</button>

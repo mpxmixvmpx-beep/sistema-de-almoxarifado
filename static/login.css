@@ -16,33 +16,50 @@ body {
     overflow-y: auto;
 }
 
-.imagem {
-    display: block;
-    width: 100%;
-    height: min(42vh, 380px);
-    min-height: 220px;
-    object-fit: cover;
-    object-position: center;
+.login-page {
+    display: grid;
+    grid-template-columns: minmax(0, 58%) minmax(0, 42%);
+    align-items: stretch;
+    min-height: 100vh;
+    overflow-y: auto;
 }
 
-#form_login {
+.login-page .imagem {
+    grid-column: 1;
+    grid-row: 1;
+    display: block;
+    width: 100%;
+    height: 100vh;
+    min-height: 100vh;
+    object-fit: cover;
+    object-position: left center;
+}
+
+.login-page #form_login {
+    grid-column: 2;
+    grid-row: 1;
     display: flex;
     justify-content: center;
+    align-items: center;
     width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     margin: 0;
-    padding: 24px;
+    padding: clamp(20px, 4vw, 56px);
 }
 
 .barra-de-login {
     position: static;
     width: min(100%, 520px);
     max-width: 520px;
+    min-width: 0;
 }
 
 .titulo {
     margin: 0 0 24px;
-    color: #fff;
-    font-size: clamp(36px, 5vw, 57px);
+    color: #F59E0B;
+    font-size: clamp(26px, 8vw, 42px);
+    font-size: clamp(28px, 3.2vw, 46px);
     font-weight: bold;
     line-height: 1.1;
     letter-spacing: 1px;
@@ -103,4 +120,24 @@ input {
     color: #192A6B;
     font-weight: bold;
     cursor: pointer;
+}
+
+@media (max-width: 700px) {
+    body.login-page {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .login-page .imagem {
+        width: 100%;
+        height: clamp(220px, 36vh, 320px);
+        min-height: 220px;
+    }
+
+    .login-page #form_login {
+        display: flex;
+        width: 100%;
+        padding: 12px 24px 24px;
+    }
 }

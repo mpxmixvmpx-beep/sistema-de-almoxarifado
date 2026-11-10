@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='adm_page.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
-    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 
 <body>
@@ -34,12 +33,12 @@
 <h1 class="titulo_pagina">CRIAR USUÁRIOS</h1>
 <div id="form_cadastro" class="area_formulario">
     
-<form action="/adicionar_user_concluido" method="POST" class="formulario_cadastro">
+<form action="/adicionar_user_concluido" method="POST" class="formulario_cadastro" novalidate>
 
     <div class="linha_campo">
         <label class="rotulo_campo">Tipo:</label>
-        <select class="entrada_campo" name="selecao">
-            <option selected>Selecione o tipo de permissão</option>
+        <select class="entrada_campo" name="selecao" required>
+            <option value="" selected disabled>Selecione o tipo de permissão</option>
             <option value="admin">Administrador</option>
             <option value="user">Usuário</option>
         </select>
@@ -47,12 +46,12 @@
 
     <div class="linha_campo">
         <label class="rotulo_campo" for="nome">Nome do Usuário:</label>
-        <input type="text" class="entrada_campo" id="nome" placeholder="Nome" name="nome">
+        <input type="text" class="entrada_campo" id="nome" placeholder="Nome" name="nome" maxlength="100" required>
     </div>
 
     <div class="linha_campo">
         <label class="rotulo_campo" for="qtd">Senha:</label>
-        <input type="password" class="entrada_campo" id="qtd" placeholder="Senha" name="senha">
+        <input type="password" class="entrada_campo" id="qtd" placeholder="Senha" name="senha" maxlength="72" required>
     </div>
 
     <button type="submit" class="botao_cadastrar">Adicionar</button>

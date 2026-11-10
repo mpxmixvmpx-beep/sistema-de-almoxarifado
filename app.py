@@ -1,10 +1,9 @@
-from flask import Flask, jsonify, render_template, request, session, redirect, url_for, send_file  # MODIFICADO
+from flask import Flask, render_template, request, session, redirect, url_for, send_file  # MODIFICADO
 import bcrypt
 import mysql.connector
 import csv
 import io
-import ipaddress
-from urllib.parse import urlparse
+import math
 
 def obter_conexao():
     return mysql.connector.connect(
@@ -20,9 +19,9 @@ def validar_login(nome, senha):
         return False
 
     conexao = obter_conexao()
-    cursor = conexao.cursor()
+    cursor = conexao.cursor(buffered=True)
     cursor.execute(
-        "SELECT nome, senha, tipo FROM usuarios WHERE nome = %s",  # MODIFICADO
+        "SELECT nome, senha, tipo FROM usuarios WHERE nome = %s LIMIT 1",  # MODIFICADO
         (nome,)
     )
     resultado = cursor.fetchone()
@@ -44,11 +43,6 @@ def validar_login(nome, senha):
     return None
 
 
-def item_para_json(item):
-    item['preco'] = float(item['preco'])
-    return item
-
-
 # MODIFICADO: funcoes pequenas evitam repetir as mesmas verificacoes.
 def usuario_logado():
     return 'usuario' in session
@@ -67,6 +61,9 @@ def buscar_estoque():
     conexao.close()
     return resultado
 
+def renderizar_erro_formulario(template, mensagem):
+    return render_template(template, mensagem_erro=mensagem), 400
+
 app = Flask(__name__)
 app.secret_key = 'chave-do-sistema-de-almoxarifado'  # MODIFICADO: habilita a sessão de login
 
@@ -84,30 +81,58 @@ def movimentacao():
 
 @app.route("/movimentacao_concluida", methods=['POST'])
 def movimentacao_concluida():
-    nome = request.form.get('nome')
-    qtd = request.form.get('qtd')
+    nome = (request.form.get('nome') or '').strip()
+    qtd_texto = (request.form.get('qtd') or '').strip()
     selecao = request.form.get('selecao')
-    
+
+    if not nome or not qtd_texto or selecao not in ('1', '2'):
+        return renderizar_erro_formulario(
+            'movimentacao_nao_concluida.html',
+            'Preencha o tipo, o nome do item e a quantidade.'
+        )
+
+    try:
+        qtd = int(qtd_texto)
+    except ValueError:
+        return renderizar_erro_formulario(
+            'movimentacao_nao_concluida.html',
+            'Informe uma quantidade inteira válida.'
+        )
+
+    if qtd <= 0:
+        return renderizar_erro_formulario(
+            'movimentacao_nao_concluida.html',
+            'A quantidade deve ser maior que zero.'
+        )
+
     conexao = obter_conexao()
     cursor = conexao.cursor(buffered=True)
 
     query = "SELECT qtd FROM objetos_do_roger WHERE nome = %s"
     cursor.execute(query, (nome,))
 
-    qtd_banco = cursor.fetchone() 
-    
-    if qtd_banco:
-        qtd_banco = int(qtd_banco[0])
-        qtd = int(qtd)
+    qtd_banco = cursor.fetchone()
+    if not qtd_banco:
+        cursor.close()
+        conexao.close()
+        return renderizar_erro_formulario(
+            'movimentacao_nao_concluida.html',
+            'O item informado não foi encontrado no estoque.'
+        )
 
-        if selecao == '1': # AUMENTAR A QUANTIDADE DE ITENS NO ESTOQUE
-            qtd = qtd_banco + qtd
-        elif selecao == '2': # DIMINUIR A QUANTIDADE DE ITENS NO ESTOQUE
-            qtd = qtd_banco - qtd
+    qtd_atual = int(qtd_banco[0])
+    nova_qtd = qtd_atual + qtd if selecao == '1' else qtd_atual - qtd
+    if nova_qtd < 0:
+        cursor.close()
+        conexao.close()
+        return renderizar_erro_formulario(
+            'movimentacao_nao_concluida.html',
+            'A saída solicitada é maior que a quantidade disponível.'
+        )
 
-        query_update = "UPDATE objetos_do_roger SET qtd = %s WHERE nome = %s;"
-        cursor.execute(query_update, (qtd, nome))
-        conexao.commit()
+    query_update = "UPDATE objetos_do_roger SET qtd = %s WHERE nome = %s;"
+    cursor.execute(query_update, (nova_qtd, nome))
+    conexao.commit()
 
     cursor.close()
     conexao.close()
@@ -142,11 +167,38 @@ def home():
 @app.route("/cadastro_concluido", methods=['GET', 'POST'])
 def cadastro_concluido():
     if request.method == 'POST':
-        nome = request.form.get('nome')
-        descricao = request.form.get('descricao')
-        qtd = request.form.get('qtd')
-        preco = request.form.get('preco')
-        imagem = request.form.get('imagem')
+        nome = (request.form.get('nome') or '').strip()
+        descricao = (request.form.get('descricao') or '').strip()
+        qtd_texto = (request.form.get('qtd') or '').strip()
+        preco_texto = (request.form.get('preco') or '').strip()
+        imagem = (request.form.get('imagem') or '').strip()
+
+        if not all((nome, descricao, qtd_texto, preco_texto, imagem)):
+            return renderizar_erro_formulario(
+                'cadastro_nao_concluido.html',
+                'Preencha todos os campos para cadastrar o item.'
+            )
+
+        if len(nome) > 100 or len(descricao) > 50 or len(imagem) > 500:
+            return renderizar_erro_formulario(
+                'cadastro_nao_concluido.html',
+                'Confira o tamanho do nome, da descrição e do link da imagem.'
+            )
+
+        try:
+            qtd = int(qtd_texto)
+            preco = float(preco_texto.replace(',', '.'))
+        except ValueError:
+            return renderizar_erro_formulario(
+                'cadastro_nao_concluido.html',
+                'Quantidade e preço precisam ser números válidos.'
+            )
+
+        if qtd < 0 or preco < 0 or not math.isfinite(preco):
+            return renderizar_erro_formulario(
+                'cadastro_nao_concluido.html',
+                'Quantidade e preço não podem ser negativos.'
+            )
 
         conexao = obter_conexao()
         cursor = conexao.cursor()
@@ -183,12 +235,32 @@ def adicionar_user_concluido():
     if not usuario_admin():  # MODIFICADO
         return redirect(url_for('estoque'))
 
+    nome = (request.form.get('nome') or '').strip()
+    senha = request.form.get('senha') or ''
+    tipo = request.form.get('selecao')
+
+    if not nome or not senha or tipo not in ('admin', 'user'):
+        return renderizar_erro_formulario(
+            'adicionar_usuario_nao_concluido.html',
+            'Preencha nome, senha e selecione um tipo de permissão.'
+        )
+
+    if len(nome) > 100 or len(senha) > 72:
+        return renderizar_erro_formulario(
+            'adicionar_usuario_nao_concluido.html',
+            'O nome deve ter até 100 caracteres e a senha até 72.'
+        )
+
     conexao = obter_conexao()
     cursor = conexao.cursor()
-
-    nome = request.form.get('nome')
-    senha = request.form.get('senha')
-    tipo = request.form.get('selecao')
+    cursor.execute('SELECT id FROM usuarios WHERE nome = %s LIMIT 1', (nome,))
+    if cursor.fetchone():
+        cursor.close()
+        conexao.close()
+        return renderizar_erro_formulario(
+            'adicionar_usuario_nao_concluido.html',
+            'Já existe um usuário com esse nome.'
+        )
 
     hash_senha = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())  # MODIFICADO
 
@@ -271,291 +343,6 @@ def importar_csv():
     cursor.close()
     conexao.close()
     return redirect(url_for('estoque'))
-
-
-# ========================= API REST =========================
-# MODIFICADO: as rotas abaixo foram adicionadas para trabalhar com JSON.
-
-@app.route('/api/itens', methods=['GET'])
-def api_listar_itens():
-    if not usuario_logado():
-        return jsonify({'erro': 'Autenticação necessária'}), 401
-
-    conexao = obter_conexao()
-    cursor = conexao.cursor(dictionary=True)
-    cursor.execute('SELECT id, nome, descricao, qtd, preco, imagem FROM objetos_do_roger')
-    itens = [item_para_json(item) for item in cursor.fetchall()]
-    cursor.close()
-    conexao.close()
-    return jsonify(itens)
-
-
-@app.route('/api/itens/<int:item_id>', methods=['GET'])
-def api_obter_item(item_id):
-    if not usuario_logado():
-        return jsonify({'erro': 'Autenticação necessária'}), 401
-
-    conexao = obter_conexao()
-    cursor = conexao.cursor(dictionary=True)
-    cursor.execute(
-        'SELECT id, nome, descricao, qtd, preco, imagem '
-        'FROM objetos_do_roger WHERE id = %s',
-        (item_id,)
-    )
-    item = cursor.fetchone()
-    cursor.close()
-    conexao.close()
-
-    if item is None:
-        return jsonify({'erro': 'Item não encontrado'}), 404
-    return jsonify(item_para_json(item))
-
-
-@app.route('/api/itens', methods=['POST'])
-def api_criar_item():
-    if not usuario_logado():
-        return jsonify({'erro': 'Autenticação necessária'}), 401
-
-    dados = request.get_json(silent=True) or {}
-    campos_obrigatorios = ('nome', 'descricao', 'qtd', 'preco', 'imagem')
-    if any(campo not in dados for campo in campos_obrigatorios):
-        return jsonify({'erro': 'Envie nome, descricao, qtd, preco e imagem'}), 400
-
-    try:
-        qtd = int(dados['qtd'])
-        preco = float(dados['preco'])
-    except (TypeError, ValueError):
-        return jsonify({'erro': 'qtd deve ser inteiro e preco deve ser numero'}), 400
-
-    if qtd < 0 or preco < 0:
-        return jsonify({'erro': 'qtd e preco nao podem ser negativos'}), 400
-
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-    cursor.execute(
-        'INSERT INTO objetos_do_roger (nome, descricao, qtd, preco, imagem) '
-        'VALUES (%s, %s, %s, %s, %s)',
-        (dados['nome'], dados['descricao'], qtd, preco, dados['imagem'])
-    )
-    conexao.commit()
-    item_id = cursor.lastrowid
-    cursor.close()
-    conexao.close()
-    return jsonify({'id': item_id, 'mensagem': 'Item criado'}), 201
-
-
-@app.route('/api/movimentacoes', methods=['POST'])
-def api_movimentar_item():
-    if not usuario_logado():
-        return jsonify({'erro': 'Autenticação necessária'}), 401
-
-    dados = request.get_json(silent=True) or {}
-    if not all(campo in dados for campo in ('item_id', 'tipo', 'quantidade')):
-        return jsonify({'erro': 'Envie item_id, tipo (entrada ou saida) e quantidade'}), 400
-
-    try:
-        item_id = int(dados['item_id'])
-        quantidade = int(dados['quantidade'])
-    except (TypeError, ValueError):
-        return jsonify({'erro': 'item_id e quantidade devem ser inteiros'}), 400
-
-    if dados['tipo'] not in ('entrada', 'saida') or quantidade <= 0:
-        return jsonify({'erro': 'tipo invalido ou quantidade nao positiva'}), 400
-
-    conexao = obter_conexao()
-    cursor = conexao.cursor(dictionary=True)
-    cursor.execute(
-        'SELECT qtd FROM objetos_do_roger WHERE id = %s FOR UPDATE',
-        (item_id,)
-    )
-    item = cursor.fetchone()
-    if item is None:
-        cursor.close()
-        conexao.close()
-        return jsonify({'erro': 'Item não encontrado'}), 404
-
-    nova_qtd = item['qtd'] + quantidade if dados['tipo'] == 'entrada' else item['qtd'] - quantidade
-    if nova_qtd < 0:
-        cursor.close()
-        conexao.close()
-        return jsonify({'erro': 'Estoque insuficiente'}), 409
-
-    cursor.execute(
-        'UPDATE objetos_do_roger SET qtd = %s WHERE id = %s',
-        (nova_qtd, item_id)
-    )
-    conexao.commit()
-    cursor.close()
-    conexao.close()
-    return jsonify({'item_id': item_id, 'quantidade_atual': nova_qtd})
-
-
-@app.after_request
-def permitir_acesso_do_aplicativo(resposta):
-    origem = request.headers.get('Origin')
-    partes_origem = urlparse(origem) if origem else None
-    host_origem = partes_origem.hostname if partes_origem else None
-    origem_local = host_origem == 'localhost'
-    if host_origem:
-        try:
-            endereco = ipaddress.ip_address(host_origem)
-            origem_local = endereco.is_loopback or endereco.is_private
-        except ValueError:
-            pass
-
-    if partes_origem and partes_origem.scheme in ('http', 'https') and origem_local:
-        resposta.headers['Access-Control-Allow-Origin'] = origem
-        resposta.headers['Access-Control-Allow-Credentials'] = 'true'
-        resposta.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-        resposta.headers['Access-Control-Allow-Methods'] = 'GET, POST, DELETE, OPTIONS'
-        resposta.headers['Vary'] = 'Origin'
-    return resposta
-
-
-@app.route('/api/login', methods=['POST'])
-def api_login():
-    dados = request.get_json(silent=True) or {}
-    usuario = validar_login(dados.get('nome'), dados.get('senha'))
-    if not usuario:
-        return jsonify({'erro': 'Usuário ou senha inválidos'}), 401
-
-    session['usuario'] = usuario['nome']
-    session['tipo'] = usuario['tipo']
-    return jsonify(usuario)
-
-
-@app.route('/api/sessao', methods=['GET'])
-def api_sessao():
-    if not usuario_logado():
-        return jsonify({'erro': 'Autenticação necessária'}), 401
-    return jsonify({'nome': session['usuario'], 'tipo': session['tipo']})
-
-
-@app.route('/api/logout', methods=['POST'])
-def api_logout():
-    session.clear()
-    return jsonify({'mensagem': 'Sessão encerrada'})
-
-
-@app.route('/api/usuarios', methods=['GET', 'POST'])
-def api_usuarios():
-    if not usuario_admin():
-        return jsonify({'erro': 'Acesso restrito a administradores'}), 403
-
-    if request.method == 'GET':
-        conexao = obter_conexao()
-        cursor = conexao.cursor()
-        cursor.execute('SELECT id, nome, tipo FROM usuarios')
-        usuarios = [
-            {'id': usuario[0], 'nome': usuario[1], 'tipo': usuario[2]}
-            for usuario in cursor.fetchall()
-        ]
-        cursor.close()
-        conexao.close()
-        return jsonify(usuarios)
-
-    dados = request.get_json(silent=True) or {}
-    nome = dados.get('nome', '').strip()
-    senha = dados.get('senha', '')
-    tipo = dados.get('tipo')
-    if not nome or not senha or tipo not in ('admin', 'user'):
-        return jsonify({'erro': 'Informe nome, senha e um tipo válido'}), 400
-
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-    cursor.execute('SELECT id FROM usuarios WHERE nome = %s', (nome,))
-    if cursor.fetchone():
-        cursor.close()
-        conexao.close()
-        return jsonify({'erro': 'Este nome de usuário já está cadastrado'}), 409
-
-    hash_senha = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
-    cursor.execute(
-        'INSERT INTO usuarios (nome, senha, tipo) VALUES (%s, %s, %s)',
-        (nome, hash_senha, tipo)
-    )
-    conexao.commit()
-    usuario_id = cursor.lastrowid
-    cursor.close()
-    conexao.close()
-    return jsonify({'id': usuario_id, 'nome': nome, 'tipo': tipo}), 201
-
-
-@app.route('/api/itens', methods=['DELETE'])
-def api_excluir_itens():
-    if not usuario_admin():
-        return jsonify({'erro': 'Acesso restrito a administradores'}), 403
-
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-    cursor.execute('DELETE FROM objetos_do_roger')
-    conexao.commit()
-    cursor.close()
-    conexao.close()
-    return jsonify({'mensagem': 'Estoque excluído'})
-
-
-@app.route('/api/estoque/exportar-csv', methods=['GET'])
-def api_exportar_csv():
-    if not usuario_logado():
-        return jsonify({'erro': 'Autenticação necessária'}), 401
-
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-    cursor.execute('SELECT id, nome, descricao, qtd, preco, imagem FROM objetos_do_roger')
-    itens = cursor.fetchall()
-    cursor.close()
-    conexao.close()
-
-    arquivo = io.StringIO()
-    escritor = csv.writer(arquivo, delimiter=';')
-    escritor.writerow(['id', 'nome', 'descricao', 'qtd', 'preco', 'imagem'])
-    escritor.writerows(itens)
-    return arquivo.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
-
-
-@app.route('/api/estoque/importar-csv', methods=['POST'])
-def api_importar_csv():
-    if not usuario_logado():
-        return jsonify({'erro': 'Autenticação necessária'}), 401
-
-    dados = request.get_json(silent=True) or {}
-    conteudo = dados.get('csv')
-    if not isinstance(conteudo, str) or not conteudo.strip():
-        return jsonify({'erro': 'Envie o conteúdo CSV no campo csv'}), 400
-
-    leitor = csv.DictReader(io.StringIO(conteudo.lstrip('\ufeff')), delimiter=';')
-    campos = {'nome', 'descricao', 'qtd', 'preco', 'imagem'}
-    if not leitor.fieldnames or not campos.issubset(leitor.fieldnames):
-        return jsonify({'erro': 'CSV deve conter nome, descricao, qtd, preco e imagem'}), 400
-
-    linhas = []
-    try:
-        for linha in leitor:
-            qtd = int(linha['qtd'])
-            preco = float(linha['preco'].replace(',', '.'))
-            if qtd < 0 or preco < 0:
-                raise ValueError
-            linhas.append((
-                linha['nome'], linha['descricao'], qtd, preco, linha['imagem']
-            ))
-    except (ValueError, AttributeError, TypeError):
-        return jsonify({'erro': 'CSV contém quantidade ou preço inválido'}), 400
-
-    if not linhas:
-        return jsonify({'erro': 'CSV não contém itens para importar'}), 400
-
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-    cursor.executemany(
-        'INSERT INTO objetos_do_roger (nome, descricao, qtd, preco, imagem) '
-        'VALUES (%s, %s, %s, %s, %s)',
-        linhas
-    )
-    conexao.commit()
-    cursor.close()
-    conexao.close()
-    return jsonify({'importados': len(linhas)})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

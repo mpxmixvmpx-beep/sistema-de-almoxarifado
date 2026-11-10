@@ -6,12 +6,11 @@
     <title>Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}">
-    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 
     
 </head>
-<body>
-        <img src="{{ url_for('static', filename='imagens/rogereleo.png') }}" alt="Imagem de login" class="imagem">
+<body class="login-page">
+        <img src="{{ url_for('static', filename='imagens/rogerio.png') }}" alt="Imagem de login" class="imagem">
         <form id="form_login" action="/estoque" method="POST">
         <div class="barra-de-login">
             <h1 class="titulo"><b>SISTEMA DE<br>ALMOXARIFADO</b></h1>
