@@ -8,11 +8,11 @@ from urllib.parse import urlparse
 
 def obter_conexao():
     return mysql.connector.connect(
-        host='mysql',
-        port='3306',
+        host='localhost',
+        port=3306,
         user='root',
         database='roger_partidaco',
-        password='root'
+        password='Bcm-0157'
     )
 
 def validar_login(nome, senha):

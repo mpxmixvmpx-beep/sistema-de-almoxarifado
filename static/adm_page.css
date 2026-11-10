@@ -165,10 +165,9 @@ h1.titulo_pagina {
 
 .tabela_usuarios {
     width: 95%;
-    height: 95%;
-    margin-top: 20px;
-    margin-left: auto;
-    margin-right: auto;
+    height: auto;
+    margin: 20px auto 24px;
+    table-layout: fixed;
     background: #fff;
 }
 
@@ -178,9 +177,15 @@ h1.titulo_pagina {
     text-align: center;
 }
 
-.tabela_usuarios th {
+.tabela_usuarios thead th {
     background: #0a1f44;
     color: #fff;
+}
+
+.tabela_usuarios td {
+    background: #fff;
+    color: #192A6B;
+    border-bottom: 1px solid #ddd;
 }
 
 .tabela_usuarios tr:hover {

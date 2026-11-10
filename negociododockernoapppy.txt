@@ -1,0 +1,18 @@
+yml
+
+from flask import Flask, jsonify, render_template, request, session, redirect, url_for, send_file  # MODIFICADO
+import bcrypt
+import mysql.connector
+import csv
+import io
+import ipaddress
+from urllib.parse import urlparse
+
+def obter_conexao():
+    return mysql.connector.connect(
+        host='mysql',
+        port='3306',
+        user='root',
+        database='roger_partidaco',
+        password='root'
+    )

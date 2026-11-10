@@ -1,3 +1,7 @@
+.navbar a {
+    text-decoration: none;
+}
+
 .navbar button {
     text-decoration: none;
 }
@@ -80,8 +84,7 @@
         font-size: clamp(26px, 7vw, 38px);
     }
 
-    #tabela,
-    .tabela_usuarios {
+    #tabela {
         display: block;
         width: calc(100% - 24px);
         height: auto;
@@ -91,11 +94,26 @@
         -webkit-overflow-scrolling: touch;
     }
 
+    .tabela_usuarios {
+        display: table;
+        width: calc(100% - 24px);
+        height: auto;
+        margin: 12px auto;
+        table-layout: fixed;
+        white-space: normal;
+    }
+
     #tabela th,
     #tabela td,
     .tabela_usuarios th,
     .tabela_usuarios td {
         padding: 10px 12px;
+    }
+
+    .tabela_usuarios th,
+    .tabela_usuarios td {
+        width: 33.333%;
+        overflow-wrap: anywhere;
     }
 
     .acoes-estoque {
