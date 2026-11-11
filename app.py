@@ -80,6 +80,8 @@ def movimentacao_concluida():
     nome = (request.form.get('nome') or '').strip()
     qtd_texto = (request.form.get('qtd') or '').strip()
     tipo = request.form.get('selecao')
+    mensagem_erro = 'Não foi possível realizar a movimentação. Confira se todos os campos foram preenchidos e se a quantidade de saída não ultrapassa o estoque disponível ou se o item realmente existe.'
+
 
     if not nome or not qtd_texto or tipo not in ('1', '2'):
         return error_page('movimentacao_nao_concluida.html', 'Preencha o tipo, o nome do item e a quantidade.')
