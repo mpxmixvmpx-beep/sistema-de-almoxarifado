@@ -1,238 +1,181 @@
-from flask import Flask, render_template, request, session, redirect, url_for, send_file  # MODIFICADO
-import bcrypt
-import mysql.connector
-import csv
-import io
-import math
+from flask import Flask, render_template, request, session, redirect, url_for, send_file
+import bcrypt, csv, io, math, mysql.connector
 
-def obter_conexao():
+# Centraliza a conexão com o banco para não repetir a mesma configuração em cada rota.
+def db():
     return mysql.connector.connect(
         host='localhost',
         port=3306,
         user='root',
         database='roger_partidaco',
-        password='Bcm-0157'
+        password=''
     )
 
-def validar_login(nome, senha):
+# Valida login: busca o usuário pelo nome e confirma a senha com bcrypt.
+def login_user(nome, senha):
     if not nome or not senha:
         return False
 
-    conexao = obter_conexao()
-    cursor = conexao.cursor(buffered=True)
-    cursor.execute(
-        "SELECT nome, senha, tipo FROM usuarios WHERE nome = %s LIMIT 1",  # MODIFICADO
-        (nome,)
-    )
-    resultado = cursor.fetchone()
+    conn = db()
+    cur = conn.cursor(buffered=True)
+    cur.execute('SELECT nome, senha, tipo FROM usuarios WHERE nome = %s LIMIT 1', (nome,))
+    user = cur.fetchone()
+    cur.close()
+    conn.close()
 
-    cursor.close()
-    conexao.close()
-
-    # fetchall() retorna lista vazia [] se não encontrar o usuário
-    if not resultado:
+    if not user:
         return None
 
-    # Garante que a senha do banco esteja em formato bytes para o bcrypt
-    senha_banco = resultado[1]
-    if isinstance(senha_banco, str):
-        senha_banco = senha_banco.encode('utf-8')
-
-    if bcrypt.checkpw(senha.encode('utf-8'), senha_banco):
-        return {'nome': resultado[0], 'tipo': resultado[2]}  # MODIFICADO
+    hash_db = user[1].encode('utf-8') if isinstance(user[1], str) else user[1]
+    if bcrypt.checkpw(senha.encode('utf-8'), hash_db):
+        return {'nome': user[0], 'tipo': user[2]}
     return None
 
-
-# MODIFICADO: funcoes pequenas evitam repetir as mesmas verificacoes.
-def usuario_logado():
+# Helpers simples da sessão: checam se o usuário está logado e se é administrador.
+def logged():
     return 'usuario' in session
 
 
-def usuario_admin():
+def admin():
     return session.get('tipo') == 'admin'
 
+# Busca o estoque atual para renderizar na tela.
+def stock():
+    conn = db()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM objetos_do_roger')
+    data = cur.fetchall()
+    cur.close(); conn.close()
+    return data
 
-def buscar_estoque():
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-    cursor.execute('SELECT * FROM objetos_do_roger')
-    resultado = cursor.fetchall()
-    cursor.close()
-    conexao.close()
-    return resultado
+# Resposta padronizada para erro de formulário: renderiza a página correta e retorna 400.
+def error_page(template, message):
+    return render_template(template, mensagem_erro=message), 400
 
-def renderizar_erro_formulario(template, mensagem):
-    return render_template(template, mensagem_erro=mensagem), 400
 
 app = Flask(__name__)
-app.secret_key = 'chave-do-sistema-de-almoxarifado'  # MODIFICADO: habilita a sessão de login
+app.secret_key = 'chave-do-sistema-de-almoxarifado'
 
-@app.route("/login_incorreto")
+# Rotas principais do sistema: páginas de login, estoque e cadastro.
+
+
+@app.route('/login_incorreto')
 def login_incorreto():
-    return render_template("login_incorreto.html")
+    return render_template('login_incorreto.html')
 
-@app.route("/")
+
+@app.route('/')
 def index():
-    return render_template("Login_page.html")
+    return render_template('Login_page.html')
 
-@app.route("/movimentacao")
+
+@app.route('/movimentacao')
 def movimentacao():
-    return render_template("movimentacao.html")
+    return render_template('movimentacao.html')
 
-@app.route("/movimentacao_concluida", methods=['POST'])
+# Atualiza a quantidade do item: soma se for entrada, subtrai se for saída.
+@app.route('/movimentacao_concluida', methods=['POST'])
 def movimentacao_concluida():
     nome = (request.form.get('nome') or '').strip()
     qtd_texto = (request.form.get('qtd') or '').strip()
-    selecao = request.form.get('selecao')
+    tipo = request.form.get('selecao')
 
-    if not nome or not qtd_texto or selecao not in ('1', '2'):
-        return renderizar_erro_formulario(
-            'movimentacao_nao_concluida.html',
-            'Preencha o tipo, o nome do item e a quantidade.'
-        )
+    if not nome or not qtd_texto or tipo not in ('1', '2'):
+        return error_page('movimentacao_nao_concluida.html', 'Preencha o tipo, o nome do item e a quantidade.')
 
     try:
         qtd = int(qtd_texto)
     except ValueError:
-        return renderizar_erro_formulario(
-            'movimentacao_nao_concluida.html',
-            'Informe uma quantidade inteira válida.'
-        )
+        return error_page('movimentacao_nao_concluida.html', 'Informe uma quantidade inteira válida.')
 
     if qtd <= 0:
-        return renderizar_erro_formulario(
-            'movimentacao_nao_concluida.html',
-            'A quantidade deve ser maior que zero.'
-        )
+        return error_page('movimentacao_nao_concluida.html', 'A quantidade deve ser maior que zero.')
 
-    conexao = obter_conexao()
-    cursor = conexao.cursor(buffered=True)
+    conn = db(); cur = conn.cursor(buffered=True)
+    cur.execute('SELECT qtd FROM objetos_do_roger WHERE nome = %s', (nome,))
+    item = cur.fetchone()
+    if not item:
+        cur.close(); conn.close()
+        return error_page('movimentacao_nao_concluida.html', 'O item informado não foi encontrado no estoque.')
 
-    query = "SELECT qtd FROM objetos_do_roger WHERE nome = %s"
-    cursor.execute(query, (nome,))
-
-    qtd_banco = cursor.fetchone()
-    if not qtd_banco:
-        cursor.close()
-        conexao.close()
-        return renderizar_erro_formulario(
-            'movimentacao_nao_concluida.html',
-            'O item informado não foi encontrado no estoque.'
-        )
-
-    qtd_atual = int(qtd_banco[0])
-    nova_qtd = qtd_atual + qtd if selecao == '1' else qtd_atual - qtd
+    nova_qtd = int(item[0]) + qtd if tipo == '1' else int(item[0]) - qtd
     if nova_qtd < 0:
-        cursor.close()
-        conexao.close()
-        return renderizar_erro_formulario(
-            'movimentacao_nao_concluida.html',
-            'A saída solicitada é maior que a quantidade disponível.'
-        )
+        cur.close(); conn.close()
+        return error_page('movimentacao_nao_concluida.html', 'A saída solicitada é maior que a quantidade disponível.')
 
-    query_update = "UPDATE objetos_do_roger SET qtd = %s WHERE nome = %s;"
-    cursor.execute(query_update, (nova_qtd, nome))
-    conexao.commit()
+    cur.execute('UPDATE objetos_do_roger SET qtd = %s WHERE nome = %s', (nova_qtd, nome))
+    conn.commit(); cur.close(); conn.close()
+    return render_template('movimentacao_concluida.html')
 
-    cursor.close()
-    conexao.close()
-
-    return render_template("movimentacao_concluida.html")
-
-@app.route("/estoque", methods=['POST', 'GET'])
+# Ao fazer login, salva usuário e tipo na sessão; ao abrir a página, exige login ativo.
+@app.route('/estoque', methods=['POST', 'GET'])
 def estoque():
-    # MODIFICADO: valida o login somente no envio do formulário.
-    # Depois disso, o acesso por GET usa o usuário salvo na sessão.
     if request.method == 'POST':
-        nome = request.form.get('nome')
-        senha = request.form.get('senha')
-        usuario = validar_login(nome, senha)  # MODIFICADO: guarda nome e tipo na sessão
+        usuario = login_user(request.form.get('nome'), request.form.get('senha'))
         if not usuario:
             return render_template('login_incorreto.html')
-        session['usuario'] = usuario['nome']  # MODIFICADO
-        session['tipo'] = usuario['tipo']  # MODIFICADO
-    elif not usuario_logado():  # MODIFICADO
+        session['usuario'] = usuario['nome']
+        session['tipo'] = usuario['tipo']
+    elif not logged():
         return render_template('Login_page.html')
 
-    return render_template('estoque.html', resultado=buscar_estoque())  # MODIFICADO
+    return render_template('estoque.html', resultado=stock())
 
-@app.route("/cadastro")
+
+@app.route('/cadastro')
 def cadastro():
     return render_template('cadastro.html')
 
-@app.route("/home")
+
+@app.route('/home')
 def home():
-    return render_template("Home.html")
+    return render_template('Home.html')
 
-@app.route("/cadastro_concluido", methods=['GET', 'POST'])
+# Cadastra item no estoque com validações simples de campos e valores numéricos.
+@app.route('/cadastro_concluido', methods=['GET', 'POST'])
 def cadastro_concluido():
-    if request.method == 'POST':
-        nome = (request.form.get('nome') or '').strip()
-        descricao = (request.form.get('descricao') or '').strip()
-        qtd_texto = (request.form.get('qtd') or '').strip()
-        preco_texto = (request.form.get('preco') or '').strip()
-        imagem = (request.form.get('imagem') or '').strip()
+    if request.method != 'POST':
+        return render_template('cadastro.html')
 
-        if not all((nome, descricao, qtd_texto, preco_texto, imagem)):
-            return renderizar_erro_formulario(
-                'cadastro_nao_concluido.html',
-                'Preencha todos os campos para cadastrar o item.'
-            )
+    nome = (request.form.get('nome') or '').strip()
+    descricao = (request.form.get('descricao') or '').strip()
+    qtd_texto = (request.form.get('qtd') or '').strip()
+    preco_texto = (request.form.get('preco') or '').strip()
+    imagem = (request.form.get('imagem') or '').strip()
 
-        if len(nome) > 100 or len(descricao) > 50 or len(imagem) > 500:
-            return renderizar_erro_formulario(
-                'cadastro_nao_concluido.html',
-                'Confira o tamanho do nome, da descrição e do link da imagem.'
-            )
+    if not all((nome, descricao, qtd_texto, preco_texto, imagem)):
+        return error_page('cadastro_nao_concluido.html', 'Preencha todos os campos para cadastrar o item.')
 
-        try:
-            qtd = int(qtd_texto)
-            preco = float(preco_texto.replace(',', '.'))
-        except ValueError:
-            return renderizar_erro_formulario(
-                'cadastro_nao_concluido.html',
-                'Quantidade e preço precisam ser números válidos.'
-            )
+    if len(nome) > 100 or len(descricao) > 50 or len(imagem) > 500:
+        return error_page('cadastro_nao_concluido.html', 'Confira o tamanho do nome, da descrição e do link da imagem.')
 
-        if qtd < 0 or preco < 0 or not math.isfinite(preco):
-            return renderizar_erro_formulario(
-                'cadastro_nao_concluido.html',
-                'Quantidade e preço não podem ser negativos.'
-            )
+    try:
+        qtd = int(qtd_texto)
+        preco = float(preco_texto.replace(',', '.'))
+    except ValueError:
+        return error_page('cadastro_nao_concluido.html', 'Quantidade e preço precisam ser números válidos.')
 
-        conexao = obter_conexao()
-        cursor = conexao.cursor()
-        query = "INSERT INTO objetos_do_roger (nome, descricao, qtd, preco, imagem) VALUES (%s, %s, %s, %s, %s);"
-        cursor.execute(query, (nome, descricao, qtd, preco, imagem))
-        conexao.commit()
-        
-        cursor.close()
-        conexao.close()
-        
-        return render_template("cadastro_concluido.html")
-    
-    return render_template("cadastro.html")
+    if qtd < 0 or preco < 0 or not math.isfinite(preco):
+        return error_page('cadastro_nao_concluido.html', 'Quantidade e preço não podem ser negativos.')
 
-@app.route("/adm")
+    conn = db(); cur = conn.cursor()
+    cur.execute('INSERT INTO objetos_do_roger (nome, descricao, qtd, preco, imagem) VALUES (%s, %s, %s, %s, %s)', (nome, descricao, qtd, preco, imagem))
+    conn.commit(); cur.close(); conn.close()
+    return render_template('cadastro_concluido.html')
+
+# Área administrativa: só entra quem possui permissão de administrador.
+@app.route('/adm')
 def adm():
-    # MODIFICADO: somente administradores podem acessar a área ADM.
-    if not usuario_admin():  # MODIFICADO
+    if not admin():
         return redirect(url_for('estoque'))
 
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-    cursor.execute("SELECT * FROM usuarios")
-    resultado = cursor.fetchall()
+    conn = db(); cur = conn.cursor(); cur.execute('SELECT * FROM usuarios'); result = cur.fetchall(); cur.close(); conn.close()
+    return render_template('adm_page.html', resultado=result)
 
-    cursor.close()
-    conexao.close()
-
-    return render_template('adm_page.html', resultado=resultado)
-
-@app.route("/adicionar_user_concluido", methods=['POST'])
+# Cria um novo usuário com senha criptografada e validação de duplicidade.
+@app.route('/adicionar_user_concluido', methods=['POST'])
 def adicionar_user_concluido():
-    # MODIFICADO: protege também o envio direto do formulário.
-    if not usuario_admin():  # MODIFICADO
+    if not admin():
         return redirect(url_for('estoque'))
 
     nome = (request.form.get('nome') or '').strip()
@@ -240,109 +183,61 @@ def adicionar_user_concluido():
     tipo = request.form.get('selecao')
 
     if not nome or not senha or tipo not in ('admin', 'user'):
-        return renderizar_erro_formulario(
-            'adicionar_usuario_nao_concluido.html',
-            'Preencha nome, senha e selecione um tipo de permissão.'
-        )
+        return error_page('adicionar_usuario_nao_concluido.html', 'Preencha nome, senha e selecione um tipo de permissão.')
 
     if len(nome) > 100 or len(senha) > 72:
-        return renderizar_erro_formulario(
-            'adicionar_usuario_nao_concluido.html',
-            'O nome deve ter até 100 caracteres e a senha até 72.'
-        )
+        return error_page('adicionar_usuario_nao_concluido.html', 'O nome deve ter até 100 caracteres e a senha até 72.')
 
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-    cursor.execute('SELECT id FROM usuarios WHERE nome = %s LIMIT 1', (nome,))
-    if cursor.fetchone():
-        cursor.close()
-        conexao.close()
-        return renderizar_erro_formulario(
-            'adicionar_usuario_nao_concluido.html',
-            'Já existe um usuário com esse nome.'
-        )
+    conn = db(); cur = conn.cursor()
+    cur.execute('SELECT id FROM usuarios WHERE nome = %s LIMIT 1', (nome,))
+    if cur.fetchone():
+        cur.close(); conn.close()
+        return error_page('adicionar_usuario_nao_concluido.html', 'Já existe um usuário com esse nome.')
 
-    hash_senha = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())  # MODIFICADO
-
-    query = "INSERT INTO usuarios (nome, senha, tipo) VALUES (%s, %s, %s)"
-    valores = (nome, hash_senha, tipo)
-
-    cursor.execute(query, valores)
-    conexao.commit()
-    
-    cursor.close()
-    conexao.close()
-    
+    hash_senha = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
+    cur.execute('INSERT INTO usuarios (nome, senha, tipo) VALUES (%s, %s, %s)', (nome, hash_senha, tipo))
+    conn.commit(); cur.close(); conn.close()
     return render_template('adicionar_user_concluido.html')
 
-
-# ========================= ESTOQUE: CSV E EXCLUSAO =========================
-# MODIFICADO: exclui todos os itens somente para administrador.
+# Exclui tudo do estoque; só administrador pode executar essa ação.
 @app.route('/estoque/excluir-todos', methods=['POST'])
 def excluir_todos_itens():
-    if not usuario_admin():
+    if not admin():
         return redirect(url_for('estoque'))
 
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-    cursor.execute('DELETE FROM objetos_do_roger')
-    conexao.commit()
-    cursor.close()
-    conexao.close()
+    conn = db(); cur = conn.cursor(); cur.execute('DELETE FROM objetos_do_roger'); conn.commit(); cur.close(); conn.close()
     return redirect(url_for('estoque'))
 
-
-# MODIFICADO: exporta todos os itens em CSV, que abre no Excel.
+# Exporta o estoque em CSV para download em Excel ou planilha.
 @app.route('/estoque/exportar-csv')
 def exportar_csv():
-    # MODIFICADO: somente usuarios logados podem exportar o estoque.
-    if not usuario_logado():
+    if not logged():
         return redirect(url_for('index'))
 
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-    cursor.execute('SELECT id, nome, descricao, qtd, preco, imagem FROM objetos_do_roger')
-    itens = cursor.fetchall()
-    cursor.close()
-    conexao.close()
-
-    arquivo = io.StringIO()
-    escritor = csv.writer(arquivo, delimiter=';')
-    escritor.writerow(['id', 'nome', 'descricao', 'qtd', 'preco', 'imagem'])
-    escritor.writerows(itens)
+    conn = db(); cur = conn.cursor(); cur.execute('SELECT id, nome, descricao, qtd, preco, imagem FROM objetos_do_roger'); itens = cur.fetchall(); cur.close(); conn.close()
+    arquivo = io.StringIO(); writer = csv.writer(arquivo, delimiter=';')
+    writer.writerow(['id', 'nome', 'descricao', 'qtd', 'preco', 'imagem'])
+    writer.writerows(itens)
     arquivo.seek(0)
-    return send_file(
-        io.BytesIO(arquivo.getvalue().encode('utf-8-sig')),
-        mimetype='text/csv',
-        as_attachment=True,
-        download_name='estoque.csv'
-    )
+    return send_file(io.BytesIO(arquivo.getvalue().encode('utf-8-sig')), mimetype='text/csv', as_attachment=True, download_name='estoque.csv')
 
-
-# MODIFICADO: importa um CSV e adiciona os itens na tabela atual.
+# Importa itens em lote a partir de um CSV enviado pelo usuário logado.
 @app.route('/estoque/importar-csv', methods=['POST'])
 def importar_csv():
-    # MODIFICADO: somente usuarios logados podem importar arquivos.
-    if not usuario_logado():
+    if not logged():
         return redirect(url_for('index'))
 
     arquivo = request.files.get('arquivo_csv')
     if arquivo is None or arquivo.filename == '':
         return redirect(url_for('estoque'))
 
-    leitor = csv.DictReader(io.TextIOWrapper(arquivo.stream, encoding='utf-8-sig'), delimiter=';')
-    conexao = obter_conexao()
-    cursor = conexao.cursor()
-    for linha in leitor:
-        cursor.execute(
-            'INSERT INTO objetos_do_roger (nome, descricao, qtd, preco, imagem) '
-            'VALUES (%s, %s, %s, %s, %s)',
-            (linha['nome'], linha['descricao'], int(linha['qtd']), float(linha['preco']), linha['imagem'])
-        )
-    conexao.commit()
-    cursor.close()
-    conexao.close()
+    reader = csv.DictReader(io.TextIOWrapper(arquivo.stream, encoding='utf-8-sig'), delimiter=';')
+    conn = db(); cur = conn.cursor()
+    for linha in reader:
+        cur.execute('INSERT INTO objetos_do_roger (nome, descricao, qtd, preco, imagem) VALUES (%s, %s, %s, %s, %s)', (linha['nome'], linha['descricao'], int(linha['qtd']), float(linha['preco']), linha['imagem']))
+    conn.commit(); cur.close(); conn.close()
     return redirect(url_for('estoque'))
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=False)
