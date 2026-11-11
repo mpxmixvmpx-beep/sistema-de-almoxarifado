@@ -2,13 +2,14 @@ from flask import Flask, render_template, request, session, redirect, url_for, s
 import bcrypt, csv, io, math, mysql.connector
 
 # Centraliza a conexão com o banco para não repetir a mesma configuração em cada rota.
-def db():
+
+def obter_conexao():
     return mysql.connector.connect(
-        host='localhost',
-        port=3306,
+        host='mysql',
+        port='3306',
         user='root',
         database='roger_partidaco',
-        password=''
+        password='root'
     )
 
 # Valida login: busca o usuário pelo nome e confirma a senha com bcrypt.
@@ -16,7 +17,7 @@ def login_user(nome, senha):
     if not nome or not senha:
         return False
 
-    conn = db()
+    conn = obter_conexao()
     cur = conn.cursor(buffered=True)
     cur.execute('SELECT nome, senha, tipo FROM usuarios WHERE nome = %s LIMIT 1', (nome,))
     user = cur.fetchone()
@@ -41,7 +42,7 @@ def admin():
 
 # Busca o estoque atual para renderizar na tela.
 def stock():
-    conn = db()
+    conn = obter_conexao()
     cur = conn.cursor()
     cur.execute('SELECT * FROM objetos_do_roger')
     data = cur.fetchall()
@@ -91,7 +92,7 @@ def movimentacao_concluida():
     if qtd <= 0:
         return error_page('movimentacao_nao_concluida.html', 'A quantidade deve ser maior que zero.')
 
-    conn = db(); cur = conn.cursor(buffered=True)
+    conn = obter_conexao(); cur = conn.cursor(buffered=True)
     cur.execute('SELECT qtd FROM objetos_do_roger WHERE nome = %s', (nome,))
     item = cur.fetchone()
     if not item:
@@ -158,7 +159,7 @@ def cadastro_concluido():
     if qtd < 0 or preco < 0 or not math.isfinite(preco):
         return error_page('cadastro_nao_concluido.html', 'Quantidade e preço não podem ser negativos.')
 
-    conn = db(); cur = conn.cursor()
+    conn = obter_conexao(); cur = conn.cursor()
     cur.execute('INSERT INTO objetos_do_roger (nome, descricao, qtd, preco, imagem) VALUES (%s, %s, %s, %s, %s)', (nome, descricao, qtd, preco, imagem))
     conn.commit(); cur.close(); conn.close()
     return render_template('cadastro_concluido.html')
@@ -169,7 +170,7 @@ def adm():
     if not admin():
         return redirect(url_for('estoque'))
 
-    conn = db(); cur = conn.cursor(); cur.execute('SELECT * FROM usuarios'); result = cur.fetchall(); cur.close(); conn.close()
+    conn = obter_conexao(); cur = conn.cursor(); cur.execute('SELECT * FROM usuarios'); result = cur.fetchall(); cur.close(); conn.close()
     return render_template('adm_page.html', resultado=result)
 
 # Cria um novo usuário com senha criptografada e validação de duplicidade.
@@ -188,7 +189,7 @@ def adicionar_user_concluido():
     if len(nome) > 100 or len(senha) > 72:
         return error_page('adicionar_usuario_nao_concluido.html', 'O nome deve ter até 100 caracteres e a senha até 72.')
 
-    conn = db(); cur = conn.cursor()
+    conn = obter_conexao(); cur = conn.cursor()
     cur.execute('SELECT id FROM usuarios WHERE nome = %s LIMIT 1', (nome,))
     if cur.fetchone():
         cur.close(); conn.close()
@@ -205,7 +206,7 @@ def excluir_todos_itens():
     if not admin():
         return redirect(url_for('estoque'))
 
-    conn = db(); cur = conn.cursor(); cur.execute('DELETE FROM objetos_do_roger'); conn.commit(); cur.close(); conn.close()
+    conn = obter_conexao(); cur = conn.cursor(); cur.execute('DELETE FROM objetos_do_roger'); conn.commit(); cur.close(); conn.close()
     return redirect(url_for('estoque'))
 
 # Exporta o estoque em CSV para download em Excel ou planilha.
@@ -214,7 +215,7 @@ def exportar_csv():
     if not logged():
         return redirect(url_for('index'))
 
-    conn = db(); cur = conn.cursor(); cur.execute('SELECT id, nome, descricao, qtd, preco, imagem FROM objetos_do_roger'); itens = cur.fetchall(); cur.close(); conn.close()
+    conn = obter_conexao(); cur = conn.cursor(); cur.execute('SELECT id, nome, descricao, qtd, preco, imagem FROM objetos_do_roger'); itens = cur.fetchall(); cur.close(); conn.close()
     arquivo = io.StringIO(); writer = csv.writer(arquivo, delimiter=';')
     writer.writerow(['id', 'nome', 'descricao', 'qtd', 'preco', 'imagem'])
     writer.writerows(itens)
@@ -232,7 +233,7 @@ def importar_csv():
         return redirect(url_for('estoque'))
 
     reader = csv.DictReader(io.TextIOWrapper(arquivo.stream, encoding='utf-8-sig'), delimiter=';')
-    conn = db(); cur = conn.cursor()
+    conn = obter_conexao(); cur = conn.cursor()
     for linha in reader:
         cur.execute('INSERT INTO objetos_do_roger (nome, descricao, qtd, preco, imagem) VALUES (%s, %s, %s, %s, %s)', (linha['nome'], linha['descricao'], int(linha['qtd']), float(linha['preco']), linha['imagem']))
     conn.commit(); cur.close(); conn.close()

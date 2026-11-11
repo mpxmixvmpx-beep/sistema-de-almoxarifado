@@ -1,7 +1,7 @@
 import { WebView } from 'react-native-webview';
 import { StatusBar, StyleSheet, View } from 'react-native';
 
-const BASE_URL = 'http://10.154.20.87:5000';
+const BASE_URL = 'http://10.154.20.103:5000';
 
 export default function App() {
   return (
