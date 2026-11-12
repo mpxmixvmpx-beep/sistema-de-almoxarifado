@@ -76,10 +76,6 @@
             <td>{{ item[3] }}</td>
             <td>{{ item[4].strftime('%d/%m/%Y %H:%M') if item[4] else '-' }}</td>
         </tr>
-        {% else %}
-        <tr>
-            <td colspan="4">Nenhuma movimentação registrada.</td>
-        </tr>
         {% endfor %}
     </table>
 </div>

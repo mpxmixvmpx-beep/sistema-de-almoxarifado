@@ -53,15 +53,6 @@ def stock():
 # Busca o histórico de movimentações do estoque.
 def historico_movimentacao():
     conn = obter_conexao(); cur = conn.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS historico_movimentacao (
-            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            nome VARCHAR(100) NOT NULL,
-            tipo VARCHAR(20) NOT NULL,
-            qtd INT NOT NULL,
-            data DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
     cur.execute('SELECT id, nome, tipo, qtd, data FROM historico_movimentacao ORDER BY id DESC')
     dados = []
     for linha in cur.fetchall():

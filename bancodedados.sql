@@ -23,9 +23,19 @@ CREATE TABLE usuarios (
     tipo VARCHAR(255) 
 );
 
--- MODIFICADO: o usuario inicial pode acessar a area administrativa.
+CREATE TABLE IF NOT EXISTS historico_movimentacao (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    tipo VARCHAR(20) NOT NULL,
+    qtd INT NOT NULL,
+    data DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 INSERT INTO usuarios (nome, senha, tipo)
 VALUES ('antonio', '$2b$12$XVbddUga1J3cQ14.y7q0qeZV88.gj/22fRv.wn7wePBvVM331ljJ6', 'admin');
+-- MODIFICADO: o usuario inicial pode acessar a area administrativa.
 
 SELECT * FROM objetos_do_roger;
 SELECT * FROM usuarios;
+SELECT * FROM historico_movimentacao;
+
