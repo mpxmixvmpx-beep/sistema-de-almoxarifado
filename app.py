@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for, send_file
 import bcrypt, csv, io, math, mysql.connector
+from datetime import timedelta
 
 # Centraliza a conexão com o banco para não repetir a mesma configuração em cada rota.
 
@@ -49,6 +50,27 @@ def stock():
     cur.close(); conn.close()
     return data
 
+# Busca o histórico de movimentações do estoque.
+def historico_movimentacao():
+    conn = obter_conexao(); cur = conn.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS historico_movimentacao (
+            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            nome VARCHAR(100) NOT NULL,
+            tipo VARCHAR(20) NOT NULL,
+            qtd INT NOT NULL,
+            data DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    cur.execute('SELECT id, nome, tipo, qtd, data FROM historico_movimentacao ORDER BY id DESC')
+    dados = []
+    for linha in cur.fetchall():
+        item = list(linha)
+        if item[4]:
+            item[4] = item[4] - timedelta(hours=3)
+        dados.append(tuple(item))
+    cur.close(); conn.close(); return dados
+
 # Resposta padronizada para erro de formulário: renderiza a página correta e retorna 400.
 def error_page(template, message):
     return render_template(template, mensagem_erro=message), 400
@@ -72,7 +94,7 @@ def index():
 
 @app.route('/movimentacao')
 def movimentacao():
-    return render_template('movimentacao.html')
+    return render_template('movimentacao.html', historico=historico_movimentacao())
 
 # Atualiza a quantidade do item: soma se for entrada, subtrai se for saída.
 @app.route('/movimentacao_concluida', methods=['POST'])
@@ -104,8 +126,15 @@ def movimentacao_concluida():
         cur.close(); conn.close()
         return error_page('movimentacao_nao_concluida.html', 'A saída solicitada é maior que a quantidade disponível.')
 
-    cur.execute('UPDATE objetos_do_roger SET qtd = %s WHERE nome = %s', (nova_qtd, nome))
+    tipo_mov = 'Entrada' if tipo == '1' else 'Saída'
+    cur.execute('INSERT INTO historico_movimentacao (nome, tipo, qtd) VALUES (%s, %s, %s)', (nome, tipo_mov, qtd))
+
+    if tipo == '2' and nova_qtd == 0:
+        cur.execute('DELETE FROM objetos_do_roger WHERE nome = %s', (nome,))
+    else:
+        cur.execute('UPDATE objetos_do_roger SET qtd = %s WHERE nome = %s', (nova_qtd, nome))
     conn.commit(); cur.close(); conn.close()
+
     return render_template('movimentacao_concluida.html')
 
 # Ao fazer login, salva usuário e tipo na sessão; ao abrir a página, exige login ativo.
@@ -144,11 +173,17 @@ def cadastro_concluido():
     preco_texto = (request.form.get('preco') or '').strip()
     imagem = (request.form.get('imagem') or '').strip()
 
-    if not all((nome, descricao, qtd_texto, preco_texto, imagem)):
-        return error_page('cadastro_nao_concluido.html', 'Preencha todos os campos para cadastrar o item.')
+    if not all((nome, descricao, qtd_texto, preco_texto)):
+        return error_page('cadastro_nao_concluido.html', 'Preencha nome, descrição, quantidade e preço.')
 
-    if len(nome) > 100 or len(descricao) > 50 or len(imagem) > 500:
-        return error_page('cadastro_nao_concluido.html', 'Confira o tamanho do nome, da descrição e do link da imagem.')
+    if imagem and len(imagem) > 500:
+        return error_page('cadastro_nao_concluido.html', 'O link da imagem deve ter até 500 caracteres.')
+
+    if len(nome) > 100 or len(descricao) > 50:
+        return error_page('cadastro_nao_concluido.html', 'Confira o tamanho do nome e da descrição.')
+
+    if imagem:
+        imagem = imagem.strip()
 
     try:
         qtd = int(qtd_texto)
@@ -160,7 +195,7 @@ def cadastro_concluido():
         return error_page('cadastro_nao_concluido.html', 'Quantidade e preço não podem ser negativos.')
 
     conn = obter_conexao(); cur = conn.cursor()
-    cur.execute('INSERT INTO objetos_do_roger (nome, descricao, qtd, preco, imagem) VALUES (%s, %s, %s, %s, %s)', (nome, descricao, qtd, preco, imagem))
+    cur.execute('INSERT INTO objetos_do_roger (nome, descricao, qtd, preco, imagem) VALUES (%s, %s, %s, %s, %s)', (nome, descricao, qtd, preco, imagem or ''))
     conn.commit(); cur.close(); conn.close()
     return render_template('cadastro_concluido.html')
 

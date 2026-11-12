@@ -52,7 +52,13 @@
                 <th>{{item[2]}}</th>
                 <th>{{item[3]}}</th>
                 <th>{{item[4]}}</th>
-                <th><button class="botaodaimagem" onclick="mostrar_foto('{{item[5]}}')">Ver Imagem</button></th>
+                <th>
+                    {% if item[5] %}
+                        <button class="botaodaimagem" onclick="mostrar_foto('{{item[5]}}')">Ver Imagem</button>
+                    {% else %}
+                        Sem imagem
+                    {% endif %}
+                </th>
             </tr>
         {% endfor %}
     </table>
@@ -83,6 +89,15 @@
         });
 
         function mostrar_foto(arg) {
+            if (!arg) {
+                Swal.fire({
+                    title: 'Sem imagem',
+                    text: 'Este item não possui link de imagem.',
+                    icon: 'info'
+                });
+                return;
+            }
+
             Swal.fire({
                 imageUrl: arg,
                 imageWidth: 400,

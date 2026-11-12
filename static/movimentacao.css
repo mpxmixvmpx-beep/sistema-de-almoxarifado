@@ -153,3 +153,40 @@ h1.titulo_pagina {
     width: 20%;
     height: auto;
 }
+
+.historico-box {
+    width: 95%;
+    margin: 30px auto 0;
+}
+
+.historico-box h2 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: clamp(1.2rem, 2vw, 2rem);
+}
+
+.tabela-historico {
+    width: 95%;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #fff;
+    border-collapse: collapse;
+}
+
+.tabela-historico th,
+.tabela-historico td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.tabela-historico th {
+    background: #0a1f44;
+    color: #fff;
+    border: 1px solid #fff;
+}
+
+.tabela-historico tr:hover {
+    background: #fff;
+}

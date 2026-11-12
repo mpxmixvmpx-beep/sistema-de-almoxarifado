@@ -60,5 +60,29 @@
 </form>
 </div>
 
+<div class="historico-box">
+    <h2>Histórico de movimentação</h2>
+    <table class="tabela-historico">
+        <tr>
+            <th>Item</th>
+            <th>Tipo</th>
+            <th>Quantidade</th>
+            <th>Data</th>
+        </tr>
+        {% for item in historico %}
+        <tr>
+            <td>{{ item[1] }}</td>
+            <td>{{ item[2] }}</td>
+            <td>{{ item[3] }}</td>
+            <td>{{ item[4].strftime('%d/%m/%Y %H:%M') if item[4] else '-' }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4">Nenhuma movimentação registrada.</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
 </body>
 </html>
